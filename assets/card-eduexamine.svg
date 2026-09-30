@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 210" width="1000" height="210" role="img" aria-label="EduExamine: Online examination platform"><title>EduExamine: Online examination platform</title>
+<defs>
+  <linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#7b2ff7"/></linearGradient>
+  <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d1322"/><stop offset="1" stop-color="#0b0f19"/></linearGradient>
+  <filter id="glow" x="-20%" y="-60%" width="140%" height="220%">
+  <feGaussianBlur stdDeviation="5" result="b"/>
+  <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+</filter>
+</defs>
+<rect x="6" y="6" width="988" height="198" rx="18" fill="url(#panel)" stroke="#1f2a44"/>
+<rect x="6" y="6" width="988" height="198" rx="18" fill="none" stroke="url(#g)" stroke-width="2"
+      stroke-dasharray="220 2372" stroke-linecap="round" filter="url(#glow)">
+  <animate attributeName="stroke-dashoffset" values="0;-2592" dur="6s" repeatCount="indefinite"/>
+</rect>
+<text x="690" y="150" text-anchor="end" font-family="'Segoe UI','Inter',-apple-system,'Helvetica Neue',Arial,'DejaVu Sans',sans-serif" font-size="150" font-weight="900" fill="#00e5ff" opacity="0.05">01</text>
+<text x="40" y="42" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="12" fill="#00e5ff" letter-spacing="2">PROJECT_01 // LIVE</text>
+<text x="40" y="84" font-family="'Segoe UI','Inter',-apple-system,'Helvetica Neue',Arial,'DejaVu Sans',sans-serif" font-size="34" font-weight="800" fill="#e6edf3">EduExamine</text>
+<text x="40" y="112" font-family="'Segoe UI','Inter',-apple-system,'Helvetica Neue',Arial,'DejaVu Sans',sans-serif" font-size="16" fill="#a9b8d0">Online examination platform</text>
+<text x="40" y="141" font-family="'Segoe UI','Inter',-apple-system,'Helvetica Neue',Arial,'DejaVu Sans',sans-serif" font-size="14.5" fill="#c9d1d9">Role-based dashboards, multi-language coding tests and AI study assistants.</text>
+<rect x="40.0" y="160" width="60.0" height="26" rx="13" fill="#00e5ff" fill-opacity="0.08" stroke="#00e5ff" stroke-opacity="0.45"/><text x="70.0" y="177.5" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="12" fill="#e6edf3">React</text><rect x="108.0" y="160" width="98.0" height="26" rx="13" fill="#00e5ff" fill-opacity="0.08" stroke="#00e5ff" stroke-opacity="0.45"/><text x="157.0" y="177.5" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="12" fill="#e6edf3">TypeScript</text><rect x="214.0" y="160" width="75.2" height="26" rx="13" fill="#00e5ff" fill-opacity="0.08" stroke="#00e5ff" stroke-opacity="0.45"/><text x="251.6" y="177.5" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="12" fill="#e6edf3">Node.js</text><rect x="297.2" y="160" width="75.2" height="26" rx="13" fill="#00e5ff" fill-opacity="0.08" stroke="#00e5ff" stroke-opacity="0.45"/><text x="334.8" y="177.5" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="12" fill="#e6edf3">Express</text><rect x="380.4" y="160" width="75.2" height="26" rx="13" fill="#00e5ff" fill-opacity="0.08" stroke="#00e5ff" stroke-opacity="0.45"/><text x="418.0" y="177.5" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="12" fill="#e6edf3">MongoDB</text><rect x="463.6" y="160" width="44.8" height="26" rx="13" fill="#00e5ff" fill-opacity="0.08" stroke="#00e5ff" stroke-opacity="0.45"/><text x="486.0" y="177.5" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="12" fill="#e6edf3">JWT</text>
+<line x1="720" y1="30" x2="720" y2="180" stroke="#1f2a44"/>
+<text x="850" y="92" text-anchor="middle" font-family="'Segoe UI','Inter',-apple-system,'Helvetica Neue',Arial,'DejaVu Sans',sans-serif" font-size="54" font-weight="900" fill="url(#g)" filter="url(#glow)">5</text>
+<text x="850" y="118" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="12" fill="#8b9bb4" letter-spacing="2">CODE LANGUAGES</text>
+<rect x="765" y="140" width="170" height="36" rx="18" fill="#00e5ff" opacity="0.12">
+  <animate attributeName="opacity" values="0.08;0.28;0.08" dur="2.2s" repeatCount="indefinite"/>
+</rect>
+<rect x="765" y="140" width="170" height="36" rx="18" fill="none" stroke="#00e5ff"/>
+<text x="850" y="163" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="13" font-weight="700" fill="#00e5ff" letter-spacing="1">OPEN LIVE ↗</text>
+</svg>

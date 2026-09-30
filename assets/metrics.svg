@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 212" width="1000" height="212" role="img" aria-label="Metrics: 1K+ users served, 30-40% faster APIs, 56 calculators, 3 public projects"><title>Metrics: 1K+ users served, 30-40% faster APIs, 56 calculators, 3 public projects</title>
+<g>
+  <rect x="14.4" y="8" width="232" height="196" rx="16" fill="#0b0f19" stroke="#00e5ff" stroke-opacity="0.35"/>
+  <rect x="34.4" y="8" width="192" height="2" fill="#00e5ff" opacity="0.8"/>
+  <circle cx="130.4" cy="70" r="40" fill="none" stroke="#00e5ff" stroke-width="1.5" stroke-dasharray="3 7" opacity="0.8">
+    <animateTransform attributeName="transform" type="rotate" values="0 130.4 70;360 130.4 70" dur="14s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="130.4" cy="70" r="31" fill="#00e5ff" fill-opacity="0.08" stroke="#00e5ff" stroke-opacity="0.5"/>
+  <circle cx="130.4" cy="70" r="31" fill="none" stroke="#00e5ff" stroke-width="3" stroke-dasharray="40 155" stroke-linecap="round">
+    <animateTransform attributeName="transform" type="rotate" values="360 130.4 70;0 130.4 70" dur="3.0s" repeatCount="indefinite"/>
+  </circle>
+  <g transform="translate(130.4 70)"><circle cx="0" cy="-7" r="7" fill="none" stroke="#00e5ff" stroke-width="2.2"/><path d="M-13 13 a13 11 0 0 1 26 0" fill="none" stroke="#00e5ff" stroke-width="2.2"/></g>
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;1" begin="0.30s" dur="0.8s" fill="freeze"/>
+    <text x="130.4" y="150" text-anchor="middle" font-family="'Segoe UI','Inter',-apple-system,'Helvetica Neue',Arial,'DejaVu Sans',sans-serif" font-size="32" font-weight="800" fill="#e6edf3">1K+</text>
+    <text x="130.4" y="173" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="12" fill="#00e5ff" letter-spacing="2">USERS SERVED</text>
+    <text x="130.4" y="191" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="11" fill="#8b9bb4">production SaaS</text>
+  </g>
+</g>
+<g>
+  <rect x="260.8" y="8" width="232" height="196" rx="16" fill="#0b0f19" stroke="#39ff88" stroke-opacity="0.35"/>
+  <rect x="280.8" y="8" width="192" height="2" fill="#39ff88" opacity="0.8"/>
+  <circle cx="376.8" cy="70" r="40" fill="none" stroke="#39ff88" stroke-width="1.5" stroke-dasharray="3 7" opacity="0.8">
+    <animateTransform attributeName="transform" type="rotate" values="0 376.8 70;360 376.8 70" dur="16s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="376.8" cy="70" r="31" fill="#39ff88" fill-opacity="0.08" stroke="#39ff88" stroke-opacity="0.5"/>
+  <circle cx="376.8" cy="70" r="31" fill="none" stroke="#39ff88" stroke-width="3" stroke-dasharray="40 155" stroke-linecap="round">
+    <animateTransform attributeName="transform" type="rotate" values="360 376.8 70;0 376.8 70" dur="3.5s" repeatCount="indefinite"/>
+  </circle>
+  <g transform="translate(376.8 70)"><path d="M3 -16 L-9 3 H0 L-3 16 L9 -3 H0 Z" fill="#39ff88"/></g>
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;1" begin="0.65s" dur="0.8s" fill="freeze"/>
+    <text x="376.8" y="150" text-anchor="middle" font-family="'Segoe UI','Inter',-apple-system,'Helvetica Neue',Arial,'DejaVu Sans',sans-serif" font-size="32" font-weight="800" fill="#e6edf3">30–40%</text>
+    <text x="376.8" y="173" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="12" fill="#39ff88" letter-spacing="2">FASTER APIs</text>
+    <text x="376.8" y="191" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="11" fill="#8b9bb4">Redis caching</text>
+  </g>
+</g>
+<g>
+  <rect x="507.2" y="8" width="232" height="196" rx="16" fill="#0b0f19" stroke="#7b2ff7" stroke-opacity="0.35"/>
+  <rect x="527.2" y="8" width="192" height="2" fill="#7b2ff7" opacity="0.8"/>
+  <circle cx="623.2" cy="70" r="40" fill="none" stroke="#7b2ff7" stroke-width="1.5" stroke-dasharray="3 7" opacity="0.8">
+    <animateTransform attributeName="transform" type="rotate" values="0 623.2 70;360 623.2 70" dur="18s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="623.2" cy="70" r="31" fill="#7b2ff7" fill-opacity="0.08" stroke="#7b2ff7" stroke-opacity="0.5"/>
+  <circle cx="623.2" cy="70" r="31" fill="none" stroke="#7b2ff7" stroke-width="3" stroke-dasharray="40 155" stroke-linecap="round">
+    <animateTransform attributeName="transform" type="rotate" values="360 623.2 70;0 623.2 70" dur="4.0s" repeatCount="indefinite"/>
+  </circle>
+  <g transform="translate(623.2 70)"><rect x="-12" y="-12" width="6" height="6" rx="1.5" fill="#7b2ff7" opacity="0.45"/><rect x="-12" y="-3" width="6" height="6" rx="1.5" fill="#7b2ff7" opacity="0.63"/><rect x="-12" y="6" width="6" height="6" rx="1.5" fill="#7b2ff7" opacity="0.81"/><rect x="-3" y="-12" width="6" height="6" rx="1.5" fill="#7b2ff7" opacity="0.63"/><rect x="-3" y="-3" width="6" height="6" rx="1.5" fill="#7b2ff7" opacity="0.81"/><rect x="-3" y="6" width="6" height="6" rx="1.5" fill="#7b2ff7" opacity="0.45"/><rect x="6" y="-12" width="6" height="6" rx="1.5" fill="#7b2ff7" opacity="0.81"/><rect x="6" y="-3" width="6" height="6" rx="1.5" fill="#7b2ff7" opacity="0.45"/><rect x="6" y="6" width="6" height="6" rx="1.5" fill="#7b2ff7" opacity="0.63"/></g>
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;1" begin="1.00s" dur="0.8s" fill="freeze"/>
+    <text x="623.2" y="150" text-anchor="middle" font-family="'Segoe UI','Inter',-apple-system,'Helvetica Neue',Arial,'DejaVu Sans',sans-serif" font-size="32" font-weight="800" fill="#e6edf3">56</text>
+    <text x="623.2" y="173" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="12" fill="#7b2ff7" letter-spacing="2">CALCULATORS</text>
+    <text x="623.2" y="191" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="11" fill="#8b9bb4">SmartFinanceCalc</text>
+  </g>
+</g>
+<g>
+  <rect x="753.6" y="8" width="232" height="196" rx="16" fill="#0b0f19" stroke="#ff2bd6" stroke-opacity="0.35"/>
+  <rect x="773.6" y="8" width="192" height="2" fill="#ff2bd6" opacity="0.8"/>
+  <circle cx="869.6" cy="70" r="40" fill="none" stroke="#ff2bd6" stroke-width="1.5" stroke-dasharray="3 7" opacity="0.8">
+    <animateTransform attributeName="transform" type="rotate" values="0 869.6 70;360 869.6 70" dur="20s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="869.6" cy="70" r="31" fill="#ff2bd6" fill-opacity="0.08" stroke="#ff2bd6" stroke-opacity="0.5"/>
+  <circle cx="869.6" cy="70" r="31" fill="none" stroke="#ff2bd6" stroke-width="3" stroke-dasharray="40 155" stroke-linecap="round">
+    <animateTransform attributeName="transform" type="rotate" values="360 869.6 70;0 869.6 70" dur="4.5s" repeatCount="indefinite"/>
+  </circle>
+  <g transform="translate(869.6 70)"><path d="M0 -12 L14 -5 L0 2 L-14 -5 Z" fill="none" stroke="#ff2bd6" stroke-width="2" opacity="1.0"/><path d="M0 -5 L14 2 L0 9 L-14 2 Z" fill="none" stroke="#ff2bd6" stroke-width="2" opacity="0.65"/><path d="M0 2 L14 9 L0 16 L-14 9 Z" fill="none" stroke="#ff2bd6" stroke-width="2" opacity="0.30000000000000004"/></g>
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;1" begin="1.35s" dur="0.8s" fill="freeze"/>
+    <text x="869.6" y="150" text-anchor="middle" font-family="'Segoe UI','Inter',-apple-system,'Helvetica Neue',Arial,'DejaVu Sans',sans-serif" font-size="32" font-weight="800" fill="#e6edf3">3</text>
+    <text x="869.6" y="173" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="12" fill="#ff2bd6" letter-spacing="2">PUBLIC PROJECTS</text>
+    <text x="869.6" y="191" text-anchor="middle" font-family="'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace" font-size="11" fill="#8b9bb4">web + mobile</text>
+  </g>
+</g></svg>
