@@ -8,9 +8,12 @@ system font stacks are used.
 Run: python3 build_assets.py
 """
 import os
+import re
 from html import escape
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+ROOT = os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(ROOT, "assets")
+ICONS = os.path.join(ROOT, "icons")  # brand marks from simple-icons.org (CC0), one 24x24 path per file
 
 SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Helvetica,Arial,sans-serif"
 MONO = "ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace"
@@ -121,10 +124,10 @@ def icon(c, kind, x, y, color):
     return out
 
 
-def save(name, w, h, label, body):
+def save(name, w, h, label, body, out=OUT):
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}" '
            f'role="img" aria-label="{escape(label)}"><title>{escape(label)}</title>{body}</svg>\n')
-    with open(os.path.join(OUT, name), "w", encoding="utf-8") as f:
+    with open(os.path.join(out, name), "w", encoding="utf-8") as f:
         f.write(svg)
 
 
@@ -478,9 +481,9 @@ def stack(c):
             ("DATA", "teal", ["MongoDB", "MySQL", "Redis"]),
             ("AI", "rose", ["LLM integration", "RAG pipelines", "OpenRouter", "Prompt engineering", "Chat history",
                             "AI services in FastAPI"]),
-            ("DEVOPS & CLOUD", "amber", ["Docker", "Docker Compose", "AWS EC2", "S3", "Lambda", "CI/CD", "Git", "Linux",
+            ("DEVOPS & CLOUD", "amber", ["Docker", "Docker Compose", "AWS EC2", "S3", "Lambda", "CI/CD", "Linux",
                                         "Vercel", "Render"]),
-            ("QUALITY", None, ["Vitest", "ESLint", "Postman"])]
+            ("QUALITY", None, ["Vitest", "ESLint"])]
     body, y, x0, right = "", 34, 180, W - 36
     for i, (label, color, items) in enumerate(rows):
         if i:
@@ -497,6 +500,22 @@ def stack(c):
     H = y + 14
     alt = " · ".join(f"{l.title()}: {', '.join(it)}" for l, _, it in rows)
     return W, H, alt, panel(W, H, c) + body
+
+
+def tools(c):
+    items = [("git", "Git", "rose"), ("amazonwebservices", "AWS", "amber"), ("googlecloud", "Google Cloud", "blue"),
+             ("docker", "Docker", "blue"), ("postman", "Postman", "amber"), ("figma", "Figma", "teal")]
+    H, gap = 178, 12
+    tw = (W - 72 - gap * (len(items) - 1)) / len(items)
+    body = panel(W, H, c) + text(36, 42, "TOOLS & PLATFORMS", 11.5, c["muted"], MONO, 600, ls=1.5)
+    for i, (slug, name, color) in enumerate(items):
+        x, y = 36 + i * (tw + gap), 58
+        path = re.search(r' d="([^"]+)"', open(os.path.join(ICONS, f"{slug}.svg"), encoding="utf-8").read()).group(1)
+        body += (f'<rect x="{x:.1f}" y="{y}" width="{tw:.1f}" height="92" rx="10" fill="{c[color]}" '
+                 f'fill-opacity="{c["tint"]:.2f}" stroke="{c[color]}" stroke-opacity="0.3"/>'
+                 f'<path d="{path}" fill="{c[color]}" transform="translate({x + tw / 2 - 15:.1f} {y + 16}) scale(1.25)"/>'
+                 + text(f"{x + tw / 2:.1f}", y + 74, name, 13.5, c["ink"], weight=600, anchor="middle"))
+    return W, H, "Tools and platforms: " + ", ".join(n for _, n, _ in items) + ".", body
 
 
 def footer(c):
@@ -567,7 +586,7 @@ if __name__ == "__main__":
     for mode, c in THEMES.items():
         for name, build in (("header", header), ("intro", intro), ("portfolio", portfolio), ("metrics", metrics), ("about", about_me), ("services", services),
                             ("hardening", hardening), ("experience", experience), ("platform", platform),
-                            ("education", education), ("stack", stack), ("footer", footer)):
+                            ("education", education), ("stack", stack), ("tools", tools), ("footer", footer)):
             save(f"{name}-{mode}.svg", *build(c))
         for slug, spec in SECTIONS.items():
             save(f"section-{slug}-{mode}.svg", *section(c, *spec))

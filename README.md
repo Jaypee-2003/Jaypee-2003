@@ -43,6 +43,8 @@
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-dark.svg"><img src="assets/stack-light.svg" width="100%" alt="Languages: JavaScript, TypeScript, Python, SQL, Java, Go, PHP · Frontend: React, Next.js, Tailwind CSS, Bootstrap, jQuery, AJAX, Framer Motion, Vite · Mobile: React Native, Expo, Expo Router, AsyncStorage · Backend: Node.js, Express, FastAPI, Django, Laravel, REST, WebSockets, JWT, RBAC · Data: MongoDB, MySQL, Redis · Ai: LLM integration, RAG pipelines, OpenRouter, Prompt engineering, Chat history, AI services in FastAPI · Devops & Cloud: Docker, Docker Compose, AWS EC2, S3, Lambda, CI/CD, Git, Linux, Vercel, Render · Quality: Vitest, ESLint, Postman"></picture>
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/tools-dark.svg"><img src="assets/tools-light.svg" width="100%" alt="Tools and platforms: Git, AWS, Google Cloud, Docker, Postman, Figma."></picture>
+
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/section-education-dark.svg"><img src="assets/section-education-light.svg" width="100%" alt="Education"></picture>
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/education-dark.svg"><img src="assets/education-light.svg" width="100%" alt="Education at Ravenshaw University, Cuttack: B.Sc (Hons) Computer Science, 2021–2024, CGPA 7.12 out of 10. Master of Computer Applications, 2024–2026, CGPA 7.77 out of 10."></picture>
@@ -59,6 +61,6 @@
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/section-activity-dark.svg"><img src="assets/section-activity-light.svg" width="100%" alt="GitHub activity"></picture>
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Jaypee-2003/Jaypee-2003/output/github-snake-dark.svg"><img src="https://raw.githubusercontent.com/Jaypee-2003/Jaypee-2003/output/github-snake.svg" width="100%" alt="My contribution graph, with a snake eating the green squares"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Jaypee-2003/Jaypee-2003/output/activity-dark.svg"><img src="https://raw.githubusercontent.com/Jaypee-2003/Jaypee-2003/output/activity-light.svg" width="100%" alt="My GitHub contributions over the last 12 months, with streak stats and a snake winding through the grid. Redrawn daily."></picture>
 
 <a href="mailto:jaypeebehera@gmail.com"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/footer-dark.svg"><img src="assets/footer-light.svg" width="100%" alt="Hiring, or have a project in mind? Let's talk. Email jaypeebehera@gmail.com, I reply within 24 hours. Open to full-time roles, freelance and contract work. Remote or relocation, IST (UTC+5:30)."></picture></a>
