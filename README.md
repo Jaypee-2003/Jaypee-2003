@@ -1,205 +1,62 @@
-<!-- ════════════════════════ HERO ════════════════════════ -->
-<p align="center">
-  <a href="https://jaypee-2003.github.io/jaypee/">
-    <img src="assets/hero.svg" width="100%" alt="Jayprakash Behera — Full Stack Developer · MERN + TypeScript · AI Integration"/>
-  </a>
+<a href="https://jaypee-2003.github.io/jaypee/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/header-dark.svg"><img src="assets/header-light.svg" width="100%" alt="Jayprakash Behera. Full stack, AI and security: full stack apps, AI features and secure backends, from architecture to production. Open to full-time roles, freelance and contract work. Cuttack, Odisha, IST, remote or relocation."></picture></a>
+
+<p>
+  <a href="https://jaypee-2003.github.io/jaypee/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-portfolio-dark.svg"><img src="assets/link-portfolio-light.svg" height="32" alt="Portfolio"></picture></a>
+  <a href="https://www.linkedin.com/in/jayprakash-behera-69a212252/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-linkedin-dark.svg"><img src="assets/link-linkedin-light.svg" height="32" alt="LinkedIn"></picture></a>
+  <a href="mailto:jaypeebehera@gmail.com"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-email-dark.svg"><img src="assets/link-email-light.svg" height="32" alt="Email"></picture></a>
 </p>
 
-<!-- ═════════════════ QUICK NAV (clickable) ═════════════════ -->
-<p align="center">
-  <a href="#boot"><img src="https://img.shields.io/badge/01-BOOT-00e5ff?style=for-the-badge&labelColor=0b0f19"/></a>
-  <a href="#metrics"><img src="https://img.shields.io/badge/02-METRICS-39ff88?style=for-the-badge&labelColor=0b0f19"/></a>
-  <a href="#projects"><img src="https://img.shields.io/badge/03-PROJECTS-7b2ff7?style=for-the-badge&labelColor=0b0f19"/></a>
-  <a href="#log"><img src="https://img.shields.io/badge/04-LOG-ff2bd6?style=for-the-badge&labelColor=0b0f19"/></a>
-  <a href="#blueprint"><img src="https://img.shields.io/badge/05-BLUEPRINT-00e5ff?style=for-the-badge&labelColor=0b0f19"/></a>
-  <a href="#stack"><img src="https://img.shields.io/badge/06-STACK-39ff88?style=for-the-badge&labelColor=0b0f19"/></a>
-  <a href="#telemetry"><img src="https://img.shields.io/badge/07-TELEMETRY-7b2ff7?style=for-the-badge&labelColor=0b0f19"/></a>
+I build AI-powered applications, secure multi-role backends and SaaS platforms with React, Node.js, Python, Docker and AWS, and I own both the architecture and the delivery. Most recently I spent ten months at Dukaan Dost on a SaaS platform that serves 1K+ users. I'm looking for a full-time role, and I'm open to freelance and contract projects too.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/metrics-dark.svg"><img src="assets/metrics-light.svg" width="100%" alt="1K+ users on the SaaS I built · 30–40% faster APIs with Redis · 3 products live in production · 5 years of CS: B.Sc + MCA"></picture>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/section-me-dark.svg"><img src="assets/section-me-light.svg" width="100%" alt="About me"></picture>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/about-dark.svg"><img src="assets/about-light.svg" width="100%" alt="In my own words: I own features end to end: the schema, the API, the screen and the deploy. I start every system from who can do what, so security is designed in, not bolted on. My portfolio is a 3D container yard where every project is a stack of shipping containers. Based in Cuttack, Odisha (IST). Studied MCA and B.Sc CS at Ravenshaw. Worked at Dukaan Dost, remote contract. Builds with React, Node.js, Python, AWS. Right now: available immediately."></picture>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/section-services-dark.svg"><img src="assets/section-services-light.svg" width="100%" alt="What I do"></picture>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/services-dark.svg"><img src="assets/services-light.svg" width="100%" alt="APIs and back ends: Node.js, Express and FastAPI services with Redis caching and tuned MongoDB queries. Web and mobile apps: dashboards in React and Next.js; mobile apps in React Native and Expo. AI in production: LLM features through OpenRouter, so models can be swapped without a rewrite. Security by design: JWT on every request, RBAC by role, and activity logging with integrity checks."></picture>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/hardening-dark.svg"><img src="assets/hardening-light.svg" width="100%" alt="Security, practised. My own portfolio site is locked down, too: strict Content Security Policy, Trusted Types on the DOM, zero third-party requests, refuses to be framed, contact form stores nothing, pinned CI actions and CodeQL."></picture>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/section-work-dark.svg"><img src="assets/section-work-light.svg" width="100%" alt="Selected work"></picture>
+
+<a href="https://edu-examine.vercel.app/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/card-eduexamine-dark.svg"><img src="assets/card-eduexamine-light.svg" width="100%" alt="EduExamine: online exam platform with proctored coding tests. Exams from creation to analytics, tab-switch and fullscreen proctoring, JWT + RBAC for live exam sessions, AI study assistants via OpenRouter. 3 role dashboards, 5 coding languages (C, C++, Java, Python, JS), 3 integrity checks. React, TypeScript, Node.js, Express, MongoDB."></picture></a>
+
+<p><a href="https://edu-examine.vercel.app/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-live-dark.svg"><img src="assets/link-live-light.svg" height="32" alt="Live demo"></picture></a></p>
+
+<a href="https://github.com/Jaypee-2003/SmartFinanceCalc"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/card-smartfinancecalc-dark.svg"><img src="assets/card-smartfinancecalc-light.svg" width="100%" alt="SmartFinanceCalc: offline-first finance calculators for Android and iOS. India Old vs New tax regime engine, EMI, step-up SIP and XIRR engines, locale detection with no permissions, tax rules in versioned JSON. 56 calculators, 8 countries, 0 network calls. React Native, Expo, TypeScript, AsyncStorage."></picture></a>
+
+<p><a href="https://github.com/Jaypee-2003/SmartFinanceCalc"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-code-dark.svg"><img src="assets/link-code-light.svg" height="32" alt="Source code"></picture></a></p>
+
+<a href="https://jp-devanta.vercel.app/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/card-devanta-dark.svg"><img src="assets/card-devanta-light.svg" width="100%" alt="Devanta: turns a GitHub username into a live portfolio site. Takes a username, profile or repo URL; Express API ranks repos by stars; one typed JSON shape drives all themes; lint + Vitest + build before release. 3 switchable themes, 2 hosts (Vercel + Render), no signup needed. Next.js 14, TypeScript, Tailwind, Express, Vitest."></picture></a>
+
+<p>
+  <a href="https://jp-devanta.vercel.app/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-live-dark.svg"><img src="assets/link-live-light.svg" height="32" alt="Live demo"></picture></a>
+  <a href="https://github.com/Jaypee-2003/Devanta"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-code-dark.svg"><img src="assets/link-code-light.svg" height="32" alt="Source code"></picture></a>
 </p>
 
-<p align="center">
-  <a href="https://jaypee-2003.github.io/jaypee/"><img src="https://img.shields.io/badge/Portfolio-00e5ff?style=flat-square&logo=googlechrome&logoColor=black"/></a>
-  <a href="https://www.linkedin.com/in/jayprakash-behera-69a212252/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white"/></a>
-  <a href="mailto:jaypeebehera@gmail.com"><img src="https://img.shields.io/badge/Email-7b2ff7?style=flat-square&logo=gmail&logoColor=white"/></a>
-  <img src="https://komarev.com/ghpvc/?username=Jaypee-2003&color=ff2bd6&style=flat-square&label=Profile+views" alt="profile views"/>
-</p>
+<a href="https://khojpandit.com"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/card-khojpandit-dark.svg"><img src="assets/card-khojpandit-light.svg" width="100%" alt="KhojPandit, client work: connects people with pandits for ceremonies and rituals. Live in production, one admin panel for all site content, responsive on mobile and desktop. React, Node.js, MongoDB, Bootstrap."></picture></a>
 
-<!-- ════════════════════════ 01 BOOT ════════════════════════ -->
-<a name="boot"></a>
-<img src="assets/sec-boot.svg" width="100%" alt="01 — Boot sequence"/>
+<p><a href="https://khojpandit.com"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-site-dark.svg"><img src="assets/link-site-light.svg" height="32" alt="Live site"></picture></a></p>
 
-<p align="center">
-  <img src="assets/terminal.svg" width="100%" alt="Terminal: whoami → Full Stack Developer; 1K+ users; APIs 30–40% faster; projects; open to full-time roles"/>
-</p>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/section-experience-dark.svg"><img src="assets/section-experience-light.svg" width="100%" alt="Experience"></picture>
 
-<details>
-<summary><b>▸ <code>cat about.ts</code></b> — expand for the full profile</summary>
-<br/>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/experience-dark.svg"><img src="assets/experience-light.svg" width="100%" alt="Full Stack Developer (Contract), Dukaan Dost – Arkine Technologies, Mumbai (Remote), Sep 2025 – Jun 2026. Built and scaled a multi-module SaaS on MERN serving 1K+ users. Cut API response times 30–40% by caching high-traffic queries in Redis. REST APIs with JWT auth and RBAC for admin, staff and vendor workflows. Tuned MongoDB for concurrent load; services run on Docker Compose."></picture>
 
-```ts
-const jayprakash = {
-  role:         "Full Stack Developer",
-  location:     "Odisha, India · open to relocation",
-  education:    "MCA, Ravenshaw University (2026)",
-  experience:   "Full Stack Developer (Contract) @ Dukaan Dost – Arkine Technologies",
-  currentFocus: ["Scalable Node.js APIs", "LLM integration", "React Native apps"],
-  stack: {
-    frontend: ["React", "Next.js", "React Native (Expo)", "Tailwind CSS"],
-    backend:  ["Node.js", "Express", "FastAPI", "REST", "WebSockets"],
-    data:     ["MongoDB", "MySQL", "Redis"],
-    devops:   ["Docker", "AWS (EC2, S3)", "CI/CD", "Linux"],
-  },
-  status: "🟢 Open to full-time Full Stack / Backend roles",
-};
-```
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/platform-dark.svg"><img src="assets/platform-light.svg" width="100%" alt="Dukaan Dost architecture: admin, staff and vendor users call a Node.js and Express REST API with JWT on every request and RBAC per role. It serves inventory, orders, vendors and tasks modules backed by Redis (30–40% faster responses) and an indexed MongoDB, all running on Docker Compose."></picture>
 
-</details>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/section-timeline-dark.svg"><img src="assets/section-timeline-light.svg" width="100%" alt="Timeline"></picture>
 
-<!-- ════════════════════════ 02 METRICS ════════════════════════ -->
-<a name="metrics"></a>
-<img src="assets/sec-metrics.svg" width="100%" alt="02 — Core metrics"/>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/timeline-dark.svg"><img src="assets/timeline-light.svg" width="100%" alt="Timeline: 2021, started B.Sc (Hons) CS at Ravenshaw. 2024, B.Sc done with CGPA 7.12, started my MCA. Sep 2025, joined Dukaan Dost on a remote contract. 2026, MCA done with CGPA 7.77; contract wrapped in June. Now: open to work, full-time or freelance."></picture>
 
-<p align="center">
-  <img src="assets/metrics.svg" width="100%" alt="1K+ users served · 30–40% faster APIs · 56 calculators · 3 public projects"/>
-</p>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/section-stack-dark.svg"><img src="assets/section-stack-light.svg" width="100%" alt="Stack"></picture>
 
-<!-- ════════════════════════ 03 PROJECTS ════════════════════════ -->
-<a name="projects"></a>
-<img src="assets/sec-projects.svg" width="100%" alt="03 — Active modules"/>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-dark.svg"><img src="assets/stack-light.svg" width="100%" alt="Languages: JavaScript, TypeScript, Python, SQL (familiar: Java, Go, PHP). Frontend: React, Next.js, React Native, Expo, Tailwind CSS. Backend: Node.js, Express, FastAPI, Django, REST, WebSockets, JWT, RBAC. Data: MongoDB, MySQL, Redis. DevOps and cloud: Docker Compose, AWS EC2/S3/Lambda, CI/CD, Git, Linux, Vercel, Render. AI: LLM integration, OpenRouter, prompt engineering."></picture>
 
-<a href="https://edu-examine.vercel.app/"><img src="assets/card-eduexamine.svg" width="100%" alt="EduExamine — Online examination platform (open live)"/></a>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/section-activity-dark.svg"><img src="assets/section-activity-light.svg" width="100%" alt="GitHub activity"></picture>
 
-<details>
-<summary><b>▸ Under the hood: EduExamine</b></summary>
-<br/>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Jaypee-2003/Jaypee-2003/output/github-snake-dark.svg"><img src="https://raw.githubusercontent.com/Jaypee-2003/Jaypee-2003/output/github-snake.svg" width="100%" alt="My contribution graph, with a snake eating the green squares"></picture>
 
-- Role-based dashboards for **Student, Faculty and Admin**, covering the full exam lifecycle from creation to analytics
-- Coding assessment module that runs **C, C++, Java, Python and JavaScript**
-- Exam integrity: **tab-switch detection, fullscreen enforcement and activity logging**
-- **JWT + RBAC** secured APIs, designed for concurrent users during live exams
-- AI study assistants via the **OpenRouter API**, with prompt and chat-history management
-
-</details>
-
-<a href="https://github.com/Jaypee-2003/SmartFinanceCalc"><img src="assets/card-smartfinancecalc.svg" width="100%" alt="SmartFinanceCalc — Offline-first finance calculator app (view code)"/></a>
-
-<details>
-<summary><b>▸ Under the hood: SmartFinanceCalc</b></summary>
-<br/>
-
-- **56 calculators** across Banking, Investment, Finance and General, all computing live as you type
-- India income-tax engine: **Old vs New regime**, Sec 87A rebate with marginal relief, surcharge and cess
-- **8-country support**: locale auto-detection (no permissions) adapts currency, tax rules and presets
-- Pure, UI-free calculation modules; tax slabs live in **versioned JSON**, so yearly law changes need no code changes
-- **Zero network calls**: history and data stay on-device with AsyncStorage
-
-</details>
-
-<a href="https://jp-devanta.vercel.app/"><img src="assets/card-devanta.svg" width="100%" alt="Devanta — GitHub to portfolio generator (open live)"/></a>
-
-<details>
-<summary><b>▸ Under the hood: Devanta</b></summary>
-<br/>
-
-- Accepts a **GitHub profile URL, repo URL or username** and builds a portfolio from public data, with no signup
-- **3 switchable themes** (Minimal, Modern, Creative) driven by one typed `PortfolioData` JSON shape
-- **Express API** fetches the user and repos, ranks featured repos by stars and recency, and handles 400/403/404 cleanly
-- Next.js 14 + Framer Motion front end on **Vercel**; API on **Render**; release gate = lint + **Vitest** + build
-- [Source code →](https://github.com/Jaypee-2003/Devanta)
-
-</details>
-
-<!-- ════════════════════════ 04 MISSION LOG ════════════════════════ -->
-<a name="log"></a>
-<img src="assets/sec-log.svg" width="100%" alt="04 — Mission log"/>
-
-| ⏱ Timeline | 🛰 Mission | 📈 Outcome |
-|:--|:--|:--|
-| `2025.09 → 2026.06` | **Full Stack Developer (Contract)**<br/>Dukaan Dost – Arkine Technologies · Remote | SaaS platform (inventory, orders, vendors, tasks) serving **1K+ users**; APIs **30–40% faster** with Redis |
-| `2024 → 2026` | **Master of Computer Applications**<br/>Ravenshaw University, Cuttack | CGPA 7.77 |
-| `2021 → 2024` | **B.Sc (Hons) Computer Science**<br/>Ravenshaw University, Cuttack | CGPA 7.12 |
-
-<!-- ════════════════════════ 05 BLUEPRINT ════════════════════════ -->
-<a name="blueprint"></a>
-<img src="assets/sec-arch.svg" width="100%" alt="05 — System blueprint"/>
-
-> [!TIP]
-> The stack I ship with. Use the zoom and pan controls on the diagram to explore it.
-
-```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#0b0f19','primaryTextColor':'#e6edf3','primaryBorderColor':'#00e5ff','lineColor':'#7b2ff7','secondaryColor':'#0d1322','tertiaryColor':'#0d1322','clusterBkg':'#0d1322','clusterBorder':'#302b63','fontFamily':'monospace'}}}%%
-flowchart LR
-    U(["👥 Users<br/>Admin · Staff · Vendor"]) --> FE["⚛️ React / Next.js<br/>Web client"]
-    M(["📱 React Native<br/>Mobile client"]) --> GW
-    FE -->|"HTTPS"| GW{{"🔐 JWT + RBAC<br/>Auth layer"}}
-    GW --> API["🟢 Node.js + Express<br/>REST API"]
-    subgraph CORE ["🐳 Docker Compose"]
-        API <-->|"hot reads"| R[("⚡ Redis<br/>cache")]
-        API --> DB[("🍃 MongoDB<br/>indexed")]
-    end
-    API --> AI["🤖 LLM<br/>via OpenRouter"]
-
-    classDef cyan stroke:#00e5ff,stroke-width:2px;
-    classDef green stroke:#39ff88,stroke-width:2px;
-    classDef pink stroke:#ff2bd6,stroke-width:2px;
-    class FE,M,U cyan;
-    class GW,R green;
-    class API,DB,AI pink;
-```
-
-<!-- ════════════════════════ 06 STACK ════════════════════════ -->
-<a name="stack"></a>
-<img src="assets/sec-stack.svg" width="100%" alt="06 — Tech arsenal"/>
-
-<p align="center">
-  <img src="https://skillicons.dev/icons?i=js,ts,py,html,css,react,nextjs,tailwind,bootstrap,nodejs,express,fastapi,django,mongodb,mysql,redis,docker,aws,linux,git,github,githubactions,vercel,postman,vite&theme=dark&perline=9" alt="Tech stack icons"/>
-</p>
-
-<details>
-<summary><b>▸ Full loadout by category</b></summary>
-<br/>
-
-| Layer | Tools |
-|:--|:--|
-| **Languages** | JavaScript (ES6+) · TypeScript · Python · SQL · *familiar:* Java, Go, PHP |
-| **Frontend** | React.js · Next.js · React Native (Expo) · Tailwind CSS · Framer Motion · Bootstrap |
-| **Backend** | Node.js · Express.js · FastAPI · Django · REST APIs · WebSockets · JWT · RBAC |
-| **Data** | MongoDB (aggregation, indexing) · MySQL · Redis (caching) |
-| **DevOps** | Docker · Docker Compose · AWS (EC2, S3, Lambda) · CI/CD · Vercel · Render · Linux |
-| **AI** | LLM integration · OpenRouter API · prompt engineering |
-| **Quality** | Vitest · ESLint · Postman |
-
-</details>
-
-<!-- ════════════════════════ 07 TELEMETRY ════════════════════════ -->
-<a name="telemetry"></a>
-<img src="assets/sec-telemetry.svg" width="100%" alt="07 — Live telemetry"/>
-
-<p align="center">
-  <img height="165" src="https://github-readme-stats.vercel.app/api?username=Jaypee-2003&show_icons=true&hide_border=true&bg_color=0b0f19&title_color=00e5ff&icon_color=7b2ff7&text_color=e6edf3&count_private=true" alt="GitHub stats"/>
-  <img height="165" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Jaypee-2003&layout=compact&hide_border=true&bg_color=0b0f19&title_color=00e5ff&text_color=e6edf3" alt="Top languages"/>
-</p>
-
-<p align="center">
-  <img src="https://streak-stats.demolab.com?user=Jaypee-2003&hide_border=true&background=0b0f19&ring=00e5ff&fire=ff2bd6&currStreakLabel=00e5ff&sideLabels=e6edf3&dates=8b9bb4&currStreakNum=e6edf3&sideNums=e6edf3&stroke=1f2a44" alt="Contribution streak"/>
-</p>
-
-<p align="center">
-  <img width="100%" src="https://github-readme-activity-graph.vercel.app/graph?username=Jaypee-2003&bg_color=0b0f19&color=00e5ff&line=7b2ff7&point=ff2bd6&area=true&area_color=7b2ff7&hide_border=true" alt="Contribution activity graph"/>
-</p>
-
-<!-- Snake appears after the "Generate snake" GitHub Action runs once -->
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Jaypee-2003/Jaypee-2003/output/github-snake-dark.svg"/>
-    <img src="https://raw.githubusercontent.com/Jaypee-2003/Jaypee-2003/output/github-snake.svg" width="100%" alt="Contribution snake"/>
-  </picture>
-</p>
-
-<!-- ════════════════════════ FOOTER ════════════════════════ -->
-<p align="center">
-  <a href="mailto:jaypeebehera@gmail.com">
-    <img src="assets/footer.svg" width="100%" alt="Let's build something — email jaypeebehera@gmail.com"/>
-  </a>
-</p>
-
-<p align="center"><a href="#boot">▲ back to top</a></p>
+<a href="mailto:jaypeebehera@gmail.com"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/footer-dark.svg"><img src="assets/footer-light.svg" width="100%" alt="Hiring, or have a project in mind? Let's talk. Email jaypeebehera@gmail.com, I reply within 24 hours. Open to full-time roles, freelance and contract work. Remote or relocation, IST (UTC+5:30)."></picture></a>

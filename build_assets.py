@@ -1,309 +1,488 @@
-"""Generates the animated SVG assets for the GitHub profile README.
-All animation is CSS-free SMIL so it plays inside GitHub's <img> sandbox.
-Only system fonts are used (GitHub blocks external font loading in SVGs)."""
-import os, random
+"""Builds the SVG assets used by README.md.
+
+Every asset has a light and a dark variant. The README picks one with
+<picture> + prefers-color-scheme, so text keeps its contrast in both GitHub
+themes. GitHub shows SVGs through <img>, which can't load web fonts, so only
+system font stacks are used.
+
+Run: python3 build_assets.py
+"""
+import os
 from html import escape
 
-OUT = os.path.join(os.path.dirname(__file__), "assets")
-os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
 
-MONO = "'JetBrains Mono','Fira Code','Cascadia Code',Consolas,'SF Mono',Menlo,'DejaVu Sans Mono',monospace"
-SANS = "'Segoe UI','Inter',-apple-system,'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"
-CYAN, VIOLET, MAGENTA, GREEN = "#00e5ff", "#7b2ff7", "#ff2bd6", "#39ff88"
-BG, PANEL, BORDER, TEXT, MUTED = "#05070f", "#0b0f19", "#1f2a44", "#e6edf3", "#8b9bb4"
+SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Helvetica,Arial,sans-serif"
+MONO = "ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace"
 
-GLOW = """<filter id="glow" x="-20%" y="-60%" width="140%" height="220%">
-  <feGaussianBlur stdDeviation="{s}" result="b"/>
-  <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-</filter>"""
+THEMES = {
+    "light": dict(surface="#F7F6F3", raised="#FFFFFF", border="#E3E0D8", dots="#D8D4CA",
+                  ink="#1C2127", text="#434B56", muted="#646B76", live="#1A7F37", tint=0.08,
+                  button="#1C2127", button_text="#FFFFFF",
+                  blue="#2B4DC4", teal="#0A6B61", amber="#A24C0B", rose="#AE2F52"),
+    "dark": dict(surface="#151A21", raised="#1C232C", border="#2B323C", dots="#2E3640",
+                 ink="#ECEFF3", text="#B9C0CA", muted="#8B949E", live="#3FB950", tint=0.13,
+                 button="#ECEFF3", button_text="#0D1117",
+                 blue="#8EA6FF", teal="#52CBB8", amber="#F2AA5C", rose="#F28AA6"),
+}
+W = 880  # design width of every full-width asset; the README scales them to 100%
 
-NEON = f"""<linearGradient id="neon" x1="0" y1="0" x2="1" y2="0">
-  <stop offset="0" stop-color="{CYAN}"/><stop offset="0.5" stop-color="{VIOLET}"/><stop offset="1" stop-color="{MAGENTA}"/>
-</linearGradient>"""
+
+# ───────────────────────────── primitives ─────────────────────────────
+def text(x, y, s, size, fill, font=SANS, weight=400, anchor="start", ls=0):
+    attrs = f' font-weight="{weight}"' if weight != 400 else ""
+    attrs += f' text-anchor="{anchor}"' if anchor != "start" else ""
+    attrs += f' letter-spacing="{ls}"' if ls else ""
+    return (f'<text x="{x}" y="{y}" font-family="{font}" font-size="{size}" fill="{fill}"{attrs}>'
+            f'{escape(s)}</text>')
 
 
-def write(name, body, w, h, title):
-    svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" '
-           f'role="img" aria-label="{escape(title)}"><title>{escape(title)}</title>{body}</svg>')
+def panel(w, h, c, strip=None):
+    """Card background; `strip` paints a colored left edge clipped to the rounded corners."""
+    s = (f'<rect x="0.5" y="0.5" width="{w - 1}" height="{h - 1}" rx="14" '
+         f'fill="{c["surface"]}" stroke="{c["border"]}"/>')
+    if strip:
+        s += (f'<defs><clipPath id="card"><rect x="0.5" y="0.5" width="{w - 1}" height="{h - 1}" rx="14"/>'
+              f'</clipPath></defs><rect x="0" y="0" width="5" height="{h}" fill="{c[strip]}" clip-path="url(#card)"/>')
+    return s
+
+
+def tile(c, x, y, w, h, color):
+    """Raised box with a short accent bar, used in the header diagram and the experience card."""
+    return (f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="8" fill="{c["raised"]}" stroke="{c["border"]}"/>'
+            f'<rect x="{x + 9}" y="{y + 11}" width="2.5" height="{h - 22}" rx="1.25" fill="{c[color]}"/>')
+
+
+def chips(c, x, y, labels, color=None, size=12, h=26, gap=8):
+    """Row of rounded tags. Tinted with `color`, or neutral when color is None."""
+    out = ""
+    for label in labels:
+        w = len(label) * size * 0.62 + 20
+        if color:
+            paint, ink = (f'fill="{c[color]}" fill-opacity="{c["tint"]}" '
+                          f'stroke="{c[color]}" stroke-opacity="0.35"'), c[color]
+        else:
+            paint, ink = f'fill="{c["raised"]}" stroke="{c["border"]}"', c["ink"]
+        out += (f'<rect x="{x:.1f}" y="{y}" width="{w:.1f}" height="{h}" rx="{h / 2}" {paint}/>'
+                + text(f"{x + w / 2:.1f}", f"{y + h / 2 + size * 0.36:.1f}", label, size, ink, MONO, 500,
+                       anchor="middle"))
+        x += w + gap
+    return out, x
+
+
+def arrow(x, y, color):
+    """Small north-east arrow; drawn as a path so it never depends on a font glyph."""
+    return (f'<path d="M{x} {y + 9}L{x + 9} {y}M{x + 2} {y}H{x + 9}V{y + 7}" fill="none" '
+            f'stroke="{color}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>')
+
+
+def icon(c, kind, x, y, color):
+    s, cx, cy = 38, x + 19, y + 19
+    line = (f'fill="none" stroke="{c[color]}" stroke-width="1.7" '
+            f'stroke-linecap="round" stroke-linejoin="round"')
+    out = (f'<rect x="{x}" y="{y}" width="{s}" height="{s}" rx="10" fill="{c[color]}" '
+           f'fill-opacity="{c["tint"] * 1.5:.2f}" stroke="{c[color]}" stroke-opacity="0.35"/>')
+    if kind == "api":
+        out += text(cx, cy + 5, "{ }", 15, c[color], MONO, 700, anchor="middle")
+    elif kind == "chat":
+        out += (f'<path d="M{cx - 8} {cy - 9}H{cx + 8}Q{cx + 11} {cy - 9} {cx + 11} {cy - 6}V{cy + 2}'
+                f'Q{cx + 11} {cy + 5} {cx + 8} {cy + 5}H{cx - 2}L{cx - 7} {cy + 9}V{cy + 5}H{cx - 8}'
+                f'Q{cx - 11} {cy + 5} {cx - 11} {cy + 2}V{cy - 6}Q{cx - 11} {cy - 9} {cx - 8} {cy - 9}Z" {line}/>'
+                + "".join(f'<circle cx="{cx + d}" cy="{cy - 2}" r="1.3" fill="{c[color]}"/>' for d in (-5, 0, 5)))
+    elif kind == "web":
+        out += (f'<rect x="{cx - 11}" y="{cy - 8}" width="22" height="16" rx="2.5" {line}/>'
+                f'<path d="M{cx - 11} {cy - 3}H{cx + 11}" {line}/>'
+                + "".join(f'<circle cx="{cx + d}" cy="{cy - 5.5}" r="1" fill="{c[color]}"/>' for d in (-8, -5)))
+    elif kind == "shield":
+        out += (f'<path d="M{cx} {cy - 11}L{cx + 9} {cy - 7.5}V{cy}Q{cx + 9} {cy + 7} {cx} {cy + 11}'
+                f'Q{cx - 9} {cy + 7} {cx - 9} {cy}V{cy - 7.5}Z" {line}/>'
+                f'<path d="M{cx - 4} {cy}L{cx - 1} {cy + 3}L{cx + 4.5} {cy - 3}" {line}/>')
+    elif kind == "check":
+        out = (f'<circle cx="{x + 8}" cy="{y + 8}" r="8" fill="{c[color]}" fill-opacity="{c["tint"] * 1.5:.2f}" '
+               f'stroke="{c[color]}" stroke-opacity="0.4"/>'
+               f'<path d="M{x + 4.5} {y + 8}L{x + 7} {y + 10.5}L{x + 11.5} {y + 5.5}" {line}/>')
+    elif kind == "phone":
+        out += (f'<rect x="{cx - 7}" y="{cy - 11}" width="14" height="22" rx="3" {line}/>'
+                f'<path d="M{cx - 2.5} {cy + 7}H{cx + 2.5}" {line}/>')
+    return out
+
+
+def save(name, w, h, label, body):
+    svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}" '
+           f'role="img" aria-label="{escape(label)}"><title>{escape(label)}</title>{body}</svg>\n')
     with open(os.path.join(OUT, name), "w", encoding="utf-8") as f:
         f.write(svg)
 
 
-# ───────────────────────────── HERO ─────────────────────────────
-def hero():
-    W, H, HZ = 1000, 330, 238
-    random.seed(7)
-    verticals = "".join(
-        f'<line x1="500" y1="{HZ}" x2="{x}" y2="{H}"/>' for x in range(-1500, 2600, 125))
-    horizontals = "".join(f'<line x1="0" y1="{HZ + k * 14}" x2="{W}" y2="{HZ + k * 14}"/>' for k in range(-1, 8))
-    particles = ""
-    for _ in range(16):
-        x, r, d = random.randint(20, 980), random.choice([1, 1.3, 1.8]), random.uniform(6, 12)
-        b = -random.uniform(0, d)
-        c = random.choice([CYAN, VIOLET, MAGENTA])
-        particles += (f'<circle cx="{x}" cy="300" r="{r}" fill="{c}">'
-                      f'<animate attributeName="cy" values="310;40" dur="{d:.1f}s" begin="{b:.1f}s" repeatCount="indefinite"/>'
-                      f'<animate attributeName="opacity" values="0;0.9;0" dur="{d:.1f}s" begin="{b:.1f}s" repeatCount="indefinite"/></circle>')
-    corner = lambda x, y, dx, dy: f'<path d="M{x} {y + 22 * dy} V{y} H{x + 22 * dx}" />'
+# ───────────────────────────── page parts ─────────────────────────────
+def header(c):
+    H, X, DW = 258, 540, 300  # X, DW: left edge and width of the architecture sketch
+    half, third = (DW - 14) / 2, (DW - 20) / 3
+
+    def box(x, y, w, color, label, value, size=13):
+        x, w = round(x, 1), round(w, 1)
+        return (tile(c, x, y, w, 42, color)
+                + text(x + 20, y + 17, label, 10, c[color], MONO, 600, ls=1.2)
+                + text(x + 20, y + 33, value, size, c["ink"], weight=500))
+
+    def wire(x, y1, y2):
+        return (f'<path d="M{x:.1f} {y1}V{y2}" fill="none" stroke="{c["muted"]}" stroke-width="1.4" '
+                f'stroke-dasharray="3 4"><animate attributeName="stroke-dashoffset" values="7;0" '
+                f'dur="1.4s" repeatCount="indefinite"/></path>')
+
+    tops = [X + half / 2, X + half + 14 + half / 2]
+    bottoms = [X + i * (third + 10) + third / 2 for i in range(3)]
+    band = (f'<path d="M{X} 93H{X + DW}" stroke="{c["amber"]}" stroke-opacity="0.6" stroke-dasharray="2 4"/>'
+            f'<rect x="{X + DW / 2 - 64}" y="83" width="128" height="20" rx="10" fill="{c["surface"]}" '
+            f'stroke="{c["amber"]}" stroke-opacity="0.5"/>'
+            + text(X + DW / 2, 96.5, "AUTH · JWT + RBAC", 10, c["amber"], MONO, 600, anchor="middle", ls=0.8))
+    squares = "".join(f'<rect x="{40 + i * 12}" y="50" width="8" height="8" rx="2" fill="{c[k]}"/>'
+                      for i, k in enumerate(("blue", "teal", "amber", "rose")))
     body = f"""
 <defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="{BG}"/><stop offset="0.65" stop-color="#0c0a24"/><stop offset="1" stop-color="#170b33"/>
-  </linearGradient>
-  <linearGradient id="txt" x1="0" y1="0" x2="500" y2="0" gradientUnits="userSpaceOnUse" spreadMethod="reflect">
-    <stop offset="0" stop-color="{CYAN}"/><stop offset="0.5" stop-color="{VIOLET}"/><stop offset="1" stop-color="{MAGENTA}"/>
-    <animateTransform attributeName="gradientTransform" type="translate" values="0 0;1000 0" dur="8s" repeatCount="indefinite"/>
-  </linearGradient>
-  <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
-    <stop offset="0" stop-color="{VIOLET}" stop-opacity="0.35"/><stop offset="1" stop-color="{VIOLET}" stop-opacity="0"/>
-  </radialGradient>
-  <linearGradient id="scan" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="{CYAN}" stop-opacity="0"/><stop offset="0.5" stop-color="{CYAN}" stop-opacity="0.07"/><stop offset="1" stop-color="{CYAN}" stop-opacity="0"/>
-  </linearGradient>
-  <linearGradient id="floorfade" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="1"/>
-  </linearGradient>
-  <mask id="floormask"><rect x="0" y="{HZ}" width="{W}" height="{H - HZ}" fill="url(#floorfade)"/></mask>
-  <clipPath id="floorclip"><rect x="0" y="{HZ}" width="{W}" height="{H - HZ}"/></clipPath>
-  {GLOW.format(s=7)}
+  <pattern id="dots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="{c["dots"]}"/></pattern>
+  <clipPath id="card"><rect x="0.5" y="0.5" width="{W - 1}" height="{H - 1}" rx="14"/></clipPath>
 </defs>
-<rect width="{W}" height="{H}" rx="18" fill="url(#bg)"/>
-<ellipse cx="500" cy="120" rx="420" ry="95" fill="url(#halo)"/>
-<g stroke="{VIOLET}" stroke-width="1" mask="url(#floormask)" clip-path="url(#floorclip)" opacity="0.8">
-  {verticals}
-  <g>{horizontals}<animateTransform attributeName="transform" type="translate" values="0 0;0 14" dur="1.1s" repeatCount="indefinite"/></g>
-</g>
-<line x1="0" y1="{HZ}" x2="{W}" y2="{HZ}" stroke="{CYAN}" stroke-opacity="0.55"/>
-{particles}
-<g stroke="{CYAN}" stroke-width="2" fill="none" opacity="0.8">
-  {corner(16, 16, 1, 1)}{corner(984, 16, -1, 1)}{corner(16, 314, 1, -1)}{corner(984, 314, -1, -1)}
-</g>
-<g font-family="{MONO}" font-size="12">
-  <rect x="34" y="30" width="372" height="26" rx="13" fill="{GREEN}" fill-opacity="0.07" stroke="{GREEN}" stroke-opacity="0.5"/>
-  <circle cx="50" cy="43" r="4.5" fill="{GREEN}">
-    <animate attributeName="opacity" values="1;0.25;1" dur="1.6s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="50" cy="43" r="4.5" fill="none" stroke="{GREEN}">
-    <animate attributeName="r" values="4.5;11" dur="1.6s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.8;0" dur="1.6s" repeatCount="indefinite"/>
-  </circle>
-  <text x="64" y="47.5" fill="{GREEN}" letter-spacing="0.6">SYSTEM ONLINE · OPEN TO FULL-TIME ROLES</text>
-  <text x="966" y="47.5" fill="#6b7a99" text-anchor="end" letter-spacing="1">LOC: ODISHA, IN  //  BUILD 2026</text>
-</g>
-<text x="500" y="128" text-anchor="middle" font-family="{SANS}" font-size="58" font-weight="800"
-      letter-spacing="6" fill="url(#txt)" filter="url(#glow)">JAYPRAKASH BEHERA</text>
-<text x="500" y="168" text-anchor="middle" font-family="{MONO}" font-size="14.5" fill="#a9b8d0"
-      letter-spacing="3">FULL STACK DEVELOPER · MERN + TYPESCRIPT · AI INTEGRATION</text>
-<text x="500" y="206" text-anchor="middle" font-family="{MONO}" font-size="14" fill="{CYAN}">
-  &gt; building scalable SaaS, mobile &amp; AI-powered products<tspan>_<animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/></tspan>
-</text>
-<rect x="0" y="-70" width="{W}" height="70" fill="url(#scan)">
-  <animateTransform attributeName="transform" type="translate" values="0 0;0 400" dur="5s" repeatCount="indefinite"/>
-</rect>
+{panel(W, H, c)}
+<rect x="520" y="0" width="{W - 520}" height="{H}" fill="url(#dots)" clip-path="url(#card)"/>
+{squares}
+{text(96, 58, "FULL STACK · AI · SECURITY", 12, c["text"], MONO, 600, ls=2)}
+{text(38, 110, "Jayprakash Behera", 46, c["ink"], weight=700, ls=-0.5)}
+{text(40, 144, "Full stack apps, AI features and secure", 18, c["text"])}
+{text(40, 168, "backends, from architecture to production.", 18, c["text"])}
+<circle cx="45" cy="202" r="4" fill="{c["live"]}"/>
+<circle cx="45" cy="202" r="4" fill="none" stroke="{c["live"]}" stroke-width="1.5">
+  <animate attributeName="r" values="4;9" dur="2.4s" repeatCount="indefinite"/>
+  <animate attributeName="opacity" values="0.7;0" dur="2.4s" repeatCount="indefinite"/>
+</circle>
+{text(60, 206, "Open to full-time roles, freelance and contract", 12.5, c["text"], MONO)}
+{text(60, 228, "Cuttack, Odisha · IST · remote or relocation", 12.5, c["muted"], MONO)}
+{"".join(wire(x, 78, 108) for x in tops)}{"".join(wire(x, 150, 178) for x in bottoms)}
+{band}
+{box(X, 36, half, "blue", "WEB", "React · Next.js")}
+{box(X + half + 14, 36, half, "blue", "MOBILE", "React Native")}
+{box(X, 108, DW, "teal", "API", "Node.js · Express · FastAPI")}
+{box(X, 178, third, "teal", "DATABASE", "MongoDB", 12)}
+{box(X + third + 10, 178, third, "teal", "CACHE", "Redis", 12)}
+{box(X + 2 * (third + 10), 178, third, "rose", "AI · LLM", "OpenRouter", 12)}
 """
-    write("hero.svg", body, W, H, "Jayprakash Behera — Full Stack Developer")
+    return W, H, ("Jayprakash Behera. Full stack, AI and security: full stack apps, AI features and secure backends, "
+                  "from architecture to production. Open to full-time roles, freelance and contract work."), body
 
 
-# ─────────────────────────── TERMINAL ───────────────────────────
-def terminal():
-    W, X, Y0, LH = 1000, 36, 84, 28
-    P = [("$ ", GREEN)]
-    lines = [
-        ("cmd", P + [("whoami", TEXT)]),
-        ("out", [("Jayprakash Behera — Full Stack Developer (MERN + TypeScript)", CYAN)]),
-        ("cmd", P + [("cat experience.log", TEXT)]),
-        ("out", [("[2025.09 → 2026.06] ", "#6b7a99"), ("Dukaan Dost · built a SaaS platform serving 1K+ users", TEXT)]),
-        ("cmd", P + [("benchmark --api --cache=redis", TEXT)]),
-        ("out", [("✔ ", GREEN), ("API response time ↓ 30–40% after Redis caching", TEXT)]),
-        ("cmd", P + [("ls ~/projects", TEXT)]),
-        ("out", [("EduExamine/   ", CYAN), ("SmartFinanceCalc/   ", GREEN), ("Devanta/", MAGENTA)]),
-        ("cmd", P + [("status --hiring", TEXT)]),
-        ("out", [("● OPEN TO FULL-TIME FULL STACK / BACKEND ROLES", GREEN)]),
-    ]
-    H = Y0 + LH * len(lines) + 30
-    # schedule
-    t, sched = 0.8, []
-    for kind, segs in lines:
-        n = sum(len(s) for s, _ in segs)
-        d = max(0.5, n * 0.05) if kind == "cmd" else 0.25
-        sched.append((t, t + d, n))
-        t += d + (0.3 if kind == "cmd" else 0.55)
-    T = t + 8.0
-    k = lambda v: f"{v / T:.4f}"
-    defs, rows = [], []
-    for i, ((kind, segs), (s, e, n)) in enumerate(zip(lines, sched)):
-        y = Y0 + i * LH
-        est = min(930, n * 10.2 + 16)
-        defs.append(
-            f'<clipPath id="c{i}"><rect x="{X - 4}" y="{y - 20}" height="{LH}" width="0">'
-            f'<animate attributeName="width" values="0;0;{est:.0f};940;940" keyTimes="0;{k(s)};{k(e)};{k(e + 0.01)};1" '
-            f'dur="{T:.2f}s" repeatCount="indefinite"/></rect></clipPath>')
-        tspans = "".join(f'<tspan fill="{c}">{escape(txt)}</tspan>' for txt, c in segs)
-        rows.append(f'<text x="{X}" y="{y}" clip-path="url(#c{i})" xml:space="preserve">{tspans}</text>')
-    last_end = sched[-1][1]
-    ylast = Y0 + (len(lines) - 1) * LH
-    cursor_x = X + sum(len(s) for s, _ in lines[-1][1]) * 10.2 + 8
+def metrics(c):
+    H = 112
+    items = [("1K+", "users on the SaaS I built", "blue"),
+             ("30–40%", "faster APIs with Redis", "teal"),
+             ("3", "products live in production", "amber"),
+             ("5", "years of CS: B.Sc + MCA", "rose")]
+    cw = W / 4
+    body = panel(W, H, c)
+    for i, (value, label, color) in enumerate(items):
+        x = i * cw
+        if i:
+            body += f'<line x1="{x}" y1="26" x2="{x}" y2="86" stroke="{c["border"]}"/>'
+        body += text(x + 30, 62, value, 32, c[color], weight=700, ls=-0.5)
+        body += text(x + 30, 88, label, 13, c["text"])
+    return W, H, "1K+ users on the SaaS I built · 30–40% faster APIs with Redis · 3 products live in production · 5 years of CS: B.Sc + MCA", body
+
+
+def section(c, color, title, hint):
+    H = 56
+    title_end = 24 + len(title) * 24 * 0.58
+    body = (f'<rect x="1" y="21" width="10" height="10" rx="2.5" fill="{c[color]}"/>'
+            + text(24, 35, title, 24, c["ink"], weight=700, ls=-0.3)
+            + f'<line x1="{title_end + 20:.0f}" y1="27.5" x2="{W - len(hint) * 7.8 - 20:.0f}" y2="27.5" stroke="{c["border"]}"/>'
+            + text(W - 2, 32, hint, 12.5, c["muted"], MONO, anchor="end"))
+    return W, H, title, body
+
+
+def services(c):
+    items = [("teal", "api", "APIs and back ends", ["Node.js, Express and FastAPI services with", "Redis caching and tuned MongoDB queries"]),
+             ("blue", "web", "Web and mobile apps", ["Dashboards in React and Next.js; mobile", "apps in React Native and Expo"]),
+             ("rose", "chat", "AI in production", ["LLM features through OpenRouter, so models", "can be swapped without a rewrite"]),
+             ("amber", "shield", "Security by design", ["JWT on every request, RBAC by role, and", "activity logging with integrity checks"])]
+    tw, th, gap = (W - 56 - 14) // 2, 92, 14
+    H = 28 * 2 + th * 2 + gap
+    body = panel(W, H, c)
+    for i, (color, kind, title, lines) in enumerate(items):
+        x, y = 28 + (i % 2) * (tw + gap), 28 + (i // 2) * (th + gap)
+        body += f'<rect x="{x}" y="{y}" width="{tw}" height="{th}" rx="10" fill="{c["raised"]}" stroke="{c["border"]}"/>'
+        body += icon(c, kind, x + 18, y + 18, color)
+        body += text(x + 70, y + 36, title, 17, c["ink"], weight=700)
+        body += "".join(text(x + 70, y + 60 + j * 19, ln, 13.5, c["text"]) for j, ln in enumerate(lines))
+    label = "What I do: " + " ".join(f"{t}: {' '.join(ls)}." for _, _, t, ls in items)
+    return W, H, label, body
+
+
+def card(c, color, tag, name, tagline, stack, points, stats=()):
+    H = 240 if stats else 184
+    chip_svg, _ = chips(c, 36, 132, stack, color)
+    point_svg = "".join(
+        f'<circle cx="569" cy="{54 + i * 28}" r="3" fill="{c[color]}"/>'
+        + text(584, 59 + i * 28, p, 14, c["text"]) for i, p in enumerate(points))
+    stat_svg = ""
+    if stats:
+        stat_svg = f'<line x1="36" y1="182" x2="{W - 36}" y2="182" stroke="{c["border"]}"/>'
+        for i, (value, label) in enumerate(stats):
+            x = 36 + i * 270
+            stat_svg += (text(x, 217, value, 24, c[color], weight=700, ls=-0.3)
+                         + text(round(x + len(value) * 15 + 10), 216, label, 13, c["text"]))
     body = f"""
-<defs>{NEON}{''.join(defs)}
-  <linearGradient id="run" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0" stop-color="{CYAN}" stop-opacity="0"/><stop offset="0.5" stop-color="{CYAN}"/><stop offset="1" stop-color="{VIOLET}" stop-opacity="0"/>
-  </linearGradient>
-</defs>
-<rect x="6" y="6" width="{W - 12}" height="{H - 12}" rx="14" fill="{PANEL}" stroke="{BORDER}"/>
-<rect x="6" y="6" width="{W - 12}" height="{H - 12}" rx="14" fill="none" stroke="url(#neon)" stroke-width="1.6"
-      stroke-dasharray="180 {2 * (W + H)}" opacity="0.9">
-  <animate attributeName="stroke-dashoffset" values="0;-{2 * (W + H) - 24}" dur="7s" repeatCount="indefinite"/>
-</rect>
-<path d="M6 20 a14 14 0 0 1 14 -14 H{W - 20} a14 14 0 0 1 14 14 V44 H6 Z" fill="#111827"/>
-<circle cx="32" cy="25" r="6.5" fill="#ff5f56"/><circle cx="54" cy="25" r="6.5" fill="#ffbd2e"/><circle cx="76" cy="25" r="6.5" fill="#27c93f"/>
-<text x="{W / 2}" y="30" text-anchor="middle" font-family="{MONO}" font-size="13" fill="{MUTED}">jayprakash@dev: ~ — zsh</text>
-<g font-family="{MONO}" font-size="17">
-  <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;{k(T - 1.0)};{k(T - 0.35)};1" dur="{T:.2f}s" repeatCount="indefinite"/>
-  {''.join(rows)}
-  <g opacity="0">
-    <animate attributeName="opacity" values="0;1" keyTimes="0;{k(last_end)}" calcMode="discrete" dur="{T:.2f}s" repeatCount="indefinite"/>
-    <rect x="{cursor_x:.0f}" y="{ylast - 16}" width="10" height="20" fill="{GREEN}">
-      <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
-    </rect>
-  </g>
-</g>
-"""
-    write("terminal.svg", body, W, H, "Terminal: whoami, experience, projects, hiring status")
-
-
-# ─────────────────────────── METRICS ───────────────────────────
-def metrics():
-    W, H = 1000, 212
-    tiles = [
-        ("1K+", "USERS SERVED", "production SaaS", CYAN, "users"),
-        ("30–40%", "FASTER APIs", "Redis caching", GREEN, "bolt"),
-        ("56", "CALCULATORS", "SmartFinanceCalc", VIOLET, "grid"),
-        ("3", "PUBLIC PROJECTS", "web + mobile", MAGENTA, "stack"),
-    ]
-    icons = {
-        "users": lambda c: f'<circle cx="0" cy="-7" r="7" fill="none" stroke="{c}" stroke-width="2.2"/><path d="M-13 13 a13 11 0 0 1 26 0" fill="none" stroke="{c}" stroke-width="2.2"/>',
-        "bolt": lambda c: f'<path d="M3 -16 L-9 3 H0 L-3 16 L9 -3 H0 Z" fill="{c}"/>',
-        "grid": lambda c: "".join(f'<rect x="{-12 + i * 9}" y="{-12 + j * 9}" width="6" height="6" rx="1.5" fill="{c}" opacity="{0.45 + 0.18 * ((i + j) % 3)}"/>' for i in range(3) for j in range(3)),
-        "stack": lambda c: "".join(f'<path d="M0 {-12 + o} L14 {-5 + o} L0 {2 + o} L-14 {-5 + o} Z" fill="none" stroke="{c}" stroke-width="2" opacity="{1 - o / 20}"/>' for o in (0, 7, 14)),
-    }
-    tw, gap = 232, (W - 4 * 232) / 5
-    out = ""
-    for i, (val, lab, sub, c, ic) in enumerate(tiles):
-        x = gap + i * (tw + gap)
-        cx, cy = x + tw / 2, 70
-        out += f"""
-<g>
-  <rect x="{x:.1f}" y="8" width="{tw}" height="{H - 16}" rx="16" fill="{PANEL}" stroke="{c}" stroke-opacity="0.35"/>
-  <rect x="{x + 20:.1f}" y="8" width="{tw - 40}" height="2" fill="{c}" opacity="0.8"/>
-  <circle cx="{cx:.1f}" cy="{cy}" r="40" fill="none" stroke="{c}" stroke-width="1.5" stroke-dasharray="3 7" opacity="0.8">
-    <animateTransform attributeName="transform" type="rotate" values="0 {cx:.1f} {cy};360 {cx:.1f} {cy}" dur="{14 + i * 2}s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="{cx:.1f}" cy="{cy}" r="31" fill="{c}" fill-opacity="0.08" stroke="{c}" stroke-opacity="0.5"/>
-  <circle cx="{cx:.1f}" cy="{cy}" r="31" fill="none" stroke="{c}" stroke-width="3" stroke-dasharray="40 155" stroke-linecap="round">
-    <animateTransform attributeName="transform" type="rotate" values="360 {cx:.1f} {cy};0 {cx:.1f} {cy}" dur="{3 + i * 0.5}s" repeatCount="indefinite"/>
-  </circle>
-  <g transform="translate({cx:.1f} {cy})">{icons[ic](c)}</g>
-  <g opacity="0">
-    <animate attributeName="opacity" values="0;1" begin="{0.3 + i * 0.35:.2f}s" dur="0.8s" fill="freeze"/>
-    <text x="{cx:.1f}" y="150" text-anchor="middle" font-family="{SANS}" font-size="32" font-weight="800" fill="{TEXT}">{escape(val)}</text>
-    <text x="{cx:.1f}" y="173" text-anchor="middle" font-family="{MONO}" font-size="12" fill="{c}" letter-spacing="2">{lab}</text>
-    <text x="{cx:.1f}" y="191" text-anchor="middle" font-family="{MONO}" font-size="11" fill="{MUTED}">{escape(sub)}</text>
-  </g>
-</g>"""
-    write("metrics.svg", out, W, H, "Metrics: 1K+ users served, 30-40% faster APIs, 56 calculators, 3 public projects")
-
-
-# ───────────────────────── PROJECT CARDS ─────────────────────────
-def card(fname, idx, tag, title, sub, desc, chips, metric, mlabel, cta, c):
-    W, H = 1000, 210
-    per = 2 * (W - 12 + H - 12)
-    chip_svg, cx = "", 40
-    for ch in chips:
-        w = len(ch) * 7.6 + 22
-        chip_svg += (f'<rect x="{cx:.1f}" y="160" width="{w:.1f}" height="26" rx="13" fill="{c}" fill-opacity="0.08" stroke="{c}" stroke-opacity="0.45"/>'
-                     f'<text x="{cx + w / 2:.1f}" y="177.5" text-anchor="middle" font-family="{MONO}" font-size="12" fill="{TEXT}">{escape(ch)}</text>')
-        cx += w + 8
-    body = f"""
-<defs>
-  <linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{c}"/><stop offset="1" stop-color="{VIOLET}"/></linearGradient>
-  <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d1322"/><stop offset="1" stop-color="{PANEL}"/></linearGradient>
-  {GLOW.format(s=5)}
-</defs>
-<rect x="6" y="6" width="{W - 12}" height="{H - 12}" rx="18" fill="url(#panel)" stroke="{BORDER}"/>
-<rect x="6" y="6" width="{W - 12}" height="{H - 12}" rx="18" fill="none" stroke="url(#g)" stroke-width="2"
-      stroke-dasharray="220 {per}" stroke-linecap="round" filter="url(#glow)">
-  <animate attributeName="stroke-dashoffset" values="0;-{per + 220}" dur="6s" repeatCount="indefinite"/>
-</rect>
-<text x="690" y="150" text-anchor="end" font-family="{SANS}" font-size="150" font-weight="900" fill="{c}" opacity="0.05">{idx}</text>
-<text x="40" y="42" font-family="{MONO}" font-size="12" fill="{c}" letter-spacing="2">{escape(tag)}</text>
-<text x="40" y="84" font-family="{SANS}" font-size="34" font-weight="800" fill="{TEXT}">{escape(title)}</text>
-<text x="40" y="112" font-family="{SANS}" font-size="16" fill="#a9b8d0">{escape(sub)}</text>
-<text x="40" y="141" font-family="{SANS}" font-size="14.5" fill="#c9d1d9">{escape(desc)}</text>
+{panel(W, H, c, strip=color)}
+{text(36, 48, tag, 11.5, c[color], MONO, 600, ls=1.5)}
+{text(36, 86, name, 28, c["ink"], weight=700, ls=-0.3)}
+{text(36, 114, tagline, 16, c["text"])}
 {chip_svg}
-<line x1="720" y1="30" x2="720" y2="180" stroke="{BORDER}"/>
-<text x="850" y="92" text-anchor="middle" font-family="{SANS}" font-size="54" font-weight="900" fill="url(#g)" filter="url(#glow)">{escape(metric)}</text>
-<text x="850" y="118" text-anchor="middle" font-family="{MONO}" font-size="12" fill="{MUTED}" letter-spacing="2">{escape(mlabel)}</text>
-<rect x="765" y="140" width="170" height="36" rx="18" fill="{c}" opacity="0.12">
-  <animate attributeName="opacity" values="0.08;0.28;0.08" dur="2.2s" repeatCount="indefinite"/>
-</rect>
-<rect x="765" y="140" width="170" height="36" rx="18" fill="none" stroke="{c}"/>
-<text x="850" y="163" text-anchor="middle" font-family="{MONO}" font-size="13" font-weight="700" fill="{c}" letter-spacing="1">{escape(cta)}</text>
+<line x1="540" y1="38" x2="540" y2="146" stroke="{c["border"]}"/>
+{point_svg}
+{stat_svg}
+{arrow(842, 28, c["muted"])}
 """
-    write(fname, body, W, H, f"{title}: {sub}")
+    label = f"{name}: {tagline}. " + ". ".join(points) + "."
+    if stats:
+        label += " " + ", ".join(f"{v} {l}" for v, l in stats) + "."
+    return W, H, label, body
 
 
-# ──────────────────────── SECTION HEADERS ────────────────────────
-def section(fname, num, label, hint):
-    W, H = 1000, 58
-    body = f"""
-<defs>{NEON}
-  <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{CYAN}"/><stop offset="0.6" stop-color="{VIOLET}"/><stop offset="1" stop-color="{VIOLET}" stop-opacity="0"/></linearGradient>
-</defs>
-<text x="4" y="32" font-family="{MONO}" font-size="13" fill="{MUTED}">//{num}</text>
-<text x="46" y="33" font-family="{MONO}" font-size="22" font-weight="700" fill="{TEXT}" letter-spacing="2">{escape(label)}</text>
-<text x="996" y="32" text-anchor="end" font-family="{MONO}" font-size="12" fill="#5c6b88">{escape(hint)}</text>
-<rect x="4" y="46" width="{W - 8}" height="2" fill="url(#fade)" opacity="0.7"/>
-<rect x="4" y="45" width="90" height="4" rx="2" fill="{CYAN}">
-  <animate attributeName="x" values="4;{W - 94};4" dur="7s" repeatCount="indefinite"/>
-  <animate attributeName="opacity" values="1;0.5;1" dur="7s" repeatCount="indefinite"/>
-</rect>
-"""
-    write(fname, body, W, H, f"{num} {label}")
+def about_me(c):
+    H = 262
+    note = [["I own features end to end: the schema, the",
+             "API, the screen and the deploy. I start every",
+             "system from who can do what, so security is",
+             "designed in, not bolted on."],
+            ["My portfolio is a 3D container yard where",
+             "every project is a stack of shipping containers."]]
+    facts = [("BASED IN", "Cuttack, Odisha · IST"), ("STUDIED", "MCA and B.Sc CS at Ravenshaw"),
+             ("WORKED AT", "Dukaan Dost, remote contract"), ("BUILDS WITH", "React, Node.js, Python, AWS"),
+             ("RIGHT NOW", "Available immediately")]
+    bars, x = "", 736
+    for i, w in enumerate((2, 1, 3, 1, 2, 2, 1, 3, 1, 1, 2, 3, 1, 2, 1, 3, 2, 1, 1, 2, 3, 1, 2, 1, 2, 3)):
+        if i % 2 == 0:
+            bars += f'<rect x="{x}" y="30" width="{w * 1.5}" height="18" fill="{c["muted"]}" opacity="0.7"/>'
+        x += w * 1.5 + 1.5
+    body = (panel(W, H, c, strip="rose")
+            + text(36, 48, "IN MY OWN WORDS", 11.5, c["rose"], MONO, 600, ls=1.5)
+            + bars + text(W - 36, 62, "CUTTACK → ANYWHERE", 9.5, c["muted"], MONO, 600, anchor="end", ls=1))
+    y = 88
+    for para in note:
+        for ln in para:
+            body += text(36, y, ln, 17, c["ink"])
+            y += 25
+        y += 12
+    body += f'<line x1="490" y1="80" x2="490" y2="{H - 30}" stroke="{c["border"]}"/>'
+    for i, (label, value) in enumerate(facts):
+        fy = 96 + i * 34
+        if i:
+            body += f'<line x1="514" y1="{fy - 21}" x2="{W - 36}" y2="{fy - 21}" stroke="{c["border"]}" stroke-dasharray="2 4"/>'
+        body += text(514, fy, label, 10.5, c["muted"], MONO, 600, ls=1.2)
+        if label == "RIGHT NOW":
+            body += f'<circle cx="630" cy="{fy - 4.5}" r="4" fill="{c["live"]}"/>' + text(642, fy, value, 14, c["ink"], weight=600)
+        else:
+            body += text(624, fy, value, 14, c["ink"])
+    label = ("About me: " + " ".join(" ".join(p) for p in note) + " "
+             + " ".join(f"{l.title()}: {v}." for l, v in facts))
+    return W, H, label, body
 
 
-# ──────────────────────────── FOOTER ────────────────────────────
-def footer():
-    W, H = 1000, 170
-    body = f"""
-<defs>{NEON}{GLOW.format(s=6)}
-  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#170b33"/><stop offset="1" stop-color="{BG}"/></linearGradient>
-</defs>
-<rect width="{W}" height="{H}" rx="18" fill="url(#bg)"/>
-<g stroke="{VIOLET}" opacity="0.25">{''.join(f'<line x1="{x}" y1="0" x2="{x}" y2="{H}"/>' for x in range(0, W + 1, 50))}</g>
-<text x="500" y="70" text-anchor="middle" font-family="{MONO}" font-size="15" fill="{GREEN}" letter-spacing="3">&gt; CONNECTION ESTABLISHED</text>
-<text x="500" y="108" text-anchor="middle" font-family="{SANS}" font-size="30" font-weight="800" fill="url(#neon)" filter="url(#glow)">LET'S BUILD SOMETHING</text>
-<text x="500" y="140" text-anchor="middle" font-family="{MONO}" font-size="14" fill="{MUTED}">jaypeebehera@gmail.com · click to email<tspan fill="{CYAN}">_<animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/></tspan></text>
-"""
-    write("footer.svg", body, W, H, "Let's build something — email jaypeebehera@gmail.com")
+def experience(c):
+    H = 364
+    tiles = [("blue", "1K+ users", ["Built and scaled a multi-module SaaS on MERN:", "inventory, orders, vendors and tasks"]),
+             ("teal", "30–40% faster APIs", ["Cached high-traffic inventory and order", "queries in Redis"]),
+             ("rose", "3 access roles", ["REST APIs with JWT auth and RBAC for", "admin, staff and vendor workflows"]),
+             ("amber", "MongoDB + Docker", ["Indexed and tuned queries for concurrent", "load; services run on Docker Compose"])]
+    tw, th = (W - 72 - 16) // 2, 86
+    body = (panel(W, H, c, strip="blue")
+            + text(36, 48, "CONTRACT · REMOTE", 11.5, c["blue"], MONO, 600, ls=1.5)
+            + text(W - 36, 48, "SEP 2025 – JUN 2026", 12, c["muted"], MONO, 500, anchor="end", ls=1)
+            + text(36, 86, "Full Stack Developer", 28, c["ink"], weight=700, ls=-0.3)
+            + text(36, 114, "Dukaan Dost – Arkine Technologies · Mumbai", 16, c["text"]))
+    for i, (color, value, lines) in enumerate(tiles):
+        x, y = 36 + (i % 2) * (tw + 16), 140 + (i // 2) * (th + 16)
+        body += tile(c, x, y, tw, th, color)
+        body += text(x + 24, y + 30, value, 18, c[color], weight=700)
+        body += "".join(text(x + 24, y + 54 + j * 19, ln, 13.5, c["text"]) for j, ln in enumerate(lines))
+    label = ("Full Stack Developer (Contract), Dukaan Dost – Arkine Technologies, Mumbai (Remote), Sep 2025 – Jun 2026. "
+             + " ".join(f"{v}: {' '.join(ls)}." for _, v, ls in tiles))
+    return W, H, label, body
+
+
+def platform(c):
+    H = 238
+
+    def flow(x1, x2, y):
+        return (f'<path d="M{x1} {y}H{x2}" fill="none" stroke="{c["muted"]}" stroke-width="1.4" stroke-dasharray="3 4">'
+                f'<animate attributeName="stroke-dashoffset" values="7;0" dur="1.2s" repeatCount="indefinite"/></path>'
+                f'<path d="M{x2 - 5} {y - 4}L{x2} {y}L{x2 - 5} {y + 4}" fill="none" stroke="{c["muted"]}" '
+                f'stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>')
+
+    def box(x, y, w, h):
+        return f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="8" fill="{c["raised"]}" stroke="{c["border"]}"/>'
+
+    body = (panel(W, H, c)
+            + text(36, 42, "DUKAAN DOST · HOW THE PLATFORM FITS TOGETHER", 11.5, c["blue"], MONO, 600, ls=1.5)
+            + f'<rect x="214" y="64" width="638" height="150" rx="12" fill="none" stroke="{c["amber"]}" '
+              f'stroke-opacity="0.6" stroke-dasharray="5 5"/>'
+            + f'<rect x="226" y="57" width="118" height="15" fill="{c["surface"]}"/>'
+            + text(232, 68, "DOCKER COMPOSE", 10, c["amber"], MONO, 600, ls=1.2)
+            + text(36, 88, "USERS", 10.5, c["muted"], MONO, 600, ls=1.2))
+    for i, role in enumerate(("Admin", "Staff", "Vendor")):
+        y = 98 + i * 36
+        body += box(36, y, 140, 28) + f'<circle cx="52" cy="{y + 14}" r="3.5" fill="{c["blue"]}"/>' + text(64, y + 19, role, 13, c["ink"], weight=500)
+    body += (box(236, 86, 160, 114)
+             + text(252, 108, "API", 10.5, c["teal"], MONO, 600, ls=1.2)
+             + text(252, 130, "Node.js · Express", 14, c["ink"], weight=700)
+             + "".join(text(252, 152 + j * 18, s, 12.5, c["text"])
+                       for j, s in enumerate(("REST endpoints", "JWT on every request", "RBAC per role"))))
+    body += text(436, 88, "MODULES", 10.5, c["muted"], MONO, 600, ls=1.2)
+    for i, m in enumerate(("Inventory", "Orders", "Vendors", "Tasks")):
+        y = 96 + i * 27
+        body += box(436, y, 160, 22) + text(450, y + 15.5, m, 12.5, c["ink"], weight=500)
+    for y, label, name, note, color in ((86, "CACHE", "Redis", "30–40% faster", "teal"),
+                                        (148, "DATABASE", "MongoDB", "indexed, tuned", "rose")):
+        body += (box(636, y, 200, 52)
+                 + text(650, y + 19, label, 10.5, c[color], MONO, 600, ls=1.2)
+                 + text(650, y + 40, name, 14, c["ink"], weight=700)
+                 + text(824, y + 19, note, 10.5, c[color], MONO, 600, anchor="end"))
+    body += flow(176, 236, 143) + flow(396, 436, 143) + flow(596, 636, 112) + flow(596, 636, 174)
+    return W, H, ("Dukaan Dost architecture: admin, staff and vendor users call a Node.js and Express REST API with JWT on "
+                  "every request and RBAC per role. It serves inventory, orders, vendors and tasks modules backed by Redis "
+                  "(30–40% faster responses) and an indexed MongoDB, all running on Docker Compose."), body
+
+
+def timeline(c):
+    H = 180
+    steps = [("blue", "2021", "Started B.Sc (Hons)", "CS at Ravenshaw"),
+             ("teal", "2024", "B.Sc done · CGPA 7.12", "Started my MCA"),
+             ("amber", "SEP 2025", "Joined Dukaan Dost", "Remote contract"),
+             ("rose", "2026", "MCA done · CGPA 7.77", "Contract wrapped, June"),
+             ("live", "NOW", "Open to work", "Full-time or freelance")]
+    xs = [104 + i * (W - 208) / 4 for i in range(5)]
+    body = panel(W, H, c) + f'<line x1="{xs[0]}" y1="88" x2="{xs[-1]}" y2="88" stroke="{c["border"]}" stroke-width="2"/>'
+    for x, (color, when, title, sub) in zip(xs, steps):
+        x = round(x, 1)
+        body += (text(x, 64, when, 12, c[color], MONO, 700, anchor="middle", ls=1.2)
+                 + f'<circle cx="{x}" cy="88" r="7" fill="{c["surface"]}" stroke="{c[color]}" stroke-width="2.5"/>'
+                 + f'<circle cx="{x}" cy="88" r="3" fill="{c[color]}"/>'
+                 + text(x, 124, title, 13.5, c["ink"], weight=700, anchor="middle")
+                 + text(x, 145, sub, 12.5, c["text"], anchor="middle"))
+        if when == "NOW":
+            body += (f'<circle cx="{x}" cy="88" r="7" fill="none" stroke="{c[color]}" stroke-width="1.5">'
+                     f'<animate attributeName="r" values="7;14" dur="2.4s" repeatCount="indefinite"/>'
+                     f'<animate attributeName="opacity" values="0.7;0" dur="2.4s" repeatCount="indefinite"/></circle>')
+    return W, H, "Timeline: " + " ".join(f"{w}: {t}, {s}." for _, w, t, s in steps), body
+
+
+def hardening(c):
+    H = 172
+    items = ["Strict Content Security Policy", "Trusted Types on the DOM", "Zero third-party requests",
+             "Refuses to be framed", "Contact form stores nothing", "Pinned CI actions and CodeQL"]
+    body = (panel(W, H, c, strip="amber")
+            + icon(c, "shield", 36, 28, "amber")
+            + text(88, 42, "SECURITY, PRACTISED", 11.5, c["amber"], MONO, 600, ls=1.5)
+            + text(88, 64, "My own portfolio site is locked down, too", 17, c["ink"], weight=700))
+    for i, item in enumerate(items):
+        x, y = 36 + (i % 3) * 272, 104 + (i // 3) * 34
+        body += icon(c, "check", x, y - 12, "amber") + text(x + 26, y, item, 13.5, c["text"])
+    return W, H, "Security, practised. My own portfolio site is locked down, too: " + ", ".join(items) + ".", body
+
+
+def stack(c):
+    rows = [("LANGUAGES", None, ["JavaScript", "TypeScript", "Python", "SQL"], "familiar: Java, Go, PHP"),
+            ("FRONTEND", "blue", ["React", "Next.js", "React Native", "Expo", "Tailwind CSS"], ""),
+            ("BACKEND", "teal", ["Node.js", "Express", "FastAPI", "Django", "REST", "WebSockets", "JWT", "RBAC"], ""),
+            ("DATA", "rose", ["MongoDB", "MySQL", "Redis"], ""),
+            ("DEVOPS & CLOUD", "amber", ["Docker Compose", "AWS EC2/S3/Lambda", "CI/CD", "Git", "Linux", "Vercel", "Render"], ""),
+            ("AI", "blue", ["LLM integration", "OpenRouter", "Prompt engineering"], "")]
+    H = 34 + len(rows) * 42 + 22
+    body = panel(W, H, c)
+    for i, (label, color, items, note) in enumerate(rows):
+        y = 34 + i * 42
+        if i:
+            body += f'<line x1="36" y1="{y - 8}" x2="{W - 36}" y2="{y - 8}" stroke="{c["border"]}" stroke-dasharray="2 4"/>'
+        body += text(36, y + 17, label, 11.5, c[color] if color else c["muted"], MONO, 600, ls=1.2)
+        row, end = chips(c, 180, y, items, color)
+        body += row
+        if note:
+            body += text(f"{end + 6:.1f}", y + 17, note, 13, c["muted"], MONO)
+    alt = " · ".join(f"{l.title()}: {', '.join(it)}" + (f" ({n})" if n else "") for l, _, it, n in rows)
+    return W, H, alt, body
+
+
+def footer(c):
+    H, bw = 176, 150
+    bx = W - 36 - bw
+    roles, end = chips(c, 36, 126, ["Full-time roles", "Freelance", "Contract"], "teal")
+    where, _ = chips(c, end + 8, 126, ["Remote", "Open to relocation", "IST · UTC+5:30"])
+    body = (panel(W, H, c, strip="teal")
+            + text(36, 48, "OPEN TO WORK", 11.5, c["teal"], MONO, 600, ls=1.5)
+            + text(36, 82, "Hiring, or have a project in mind? Let's talk.", 22, c["ink"], weight=700, ls=-0.2)
+            + text(36, 108, "jaypeebehera@gmail.com · I reply within 24 hours", 14, c["text"], MONO)
+            + roles + where
+            + f'<rect x="{bx}" y="46" width="{bw}" height="40" rx="20" fill="{c["button"]}"/>'
+            + text(bx + 28, 71, "Email me", 14, c["button_text"], weight=600)
+            + arrow(bx + bw - 34, 61.5, c["button_text"]))
+    return W, H, ("Hiring, or have a project in mind? Let's talk. Email jaypeebehera@gmail.com, I reply within 24 hours. "
+                  "Open to full-time roles, freelance and contract work. Remote or relocation, IST (UTC+5:30)."), body
+
+
+PROJECTS = {
+    "eduexamine": ("rose", "WEB APP · LIVE", "EduExamine", "Online exam platform with proctored coding tests",
+                   ["React", "TypeScript", "Node.js", "Express", "MongoDB"],
+                   ["Exams from creation to analytics", "Tab-switch and fullscreen proctoring",
+                    "JWT + RBAC for live exam sessions", "AI study assistants via OpenRouter"],
+                   [("3", "role dashboards"), ("5", "coding languages"), ("3", "integrity checks")]),
+    "smartfinancecalc": ("amber", "MOBILE APP · ANDROID & iOS", "SmartFinanceCalc",
+                         "Offline-first finance calculators for Android and iOS",
+                         ["React Native", "Expo", "TypeScript", "AsyncStorage"],
+                         ["India Old vs New tax regime engine", "EMI, step-up SIP and XIRR engines",
+                          "Locale detection with no permissions", "Tax rules in versioned JSON"],
+                         [("56", "calculators"), ("8", "countries"), ("0", "network calls")]),
+    "devanta": ("blue", "WEB APP · LIVE", "Devanta", "Turns a GitHub username into a live portfolio site",
+                ["Next.js 14", "TypeScript", "Tailwind", "Express", "Vitest"],
+                ["Takes a username, profile or repo URL", "Express API ranks repos by stars",
+                 "One typed JSON shape drives all themes", "Lint + Vitest + build before release"],
+                [("3", "switchable themes"), ("2", "hosts: Vercel + Render"), ("0", "signup needed")]),
+    "khojpandit": ("teal", "CLIENT WORK · LIVE", "KhojPandit", "Connects people with pandits for ceremonies and rituals",
+                   ["React", "Node.js", "MongoDB", "Bootstrap"],
+                   ["Built for a client, live in production", "One admin panel for all site content",
+                    "Responsive on mobile and desktop"]),
+}
+
+SECTIONS = {
+    "me": ("rose", "About me", "the person behind the commits"),
+    "services": ("teal", "What I do", "for teams and clients"),
+    "work": ("blue", "Selected work", "click a card to open it"),
+    "experience": ("amber", "Experience", "10 months · remote"),
+    "timeline": ("rose", "Timeline", "2021 → now"),
+    "stack": ("teal", "Stack", "what I ship with"),
+    "activity": ("blue", "GitHub activity", "redrawn daily"),
+}
+
+LINKS = {"portfolio": ("Portfolio", "teal"), "linkedin": ("LinkedIn", "blue"), "email": ("Email", "amber"),
+         "live": ("Live demo", "live"), "site": ("Live site", "live"), "code": ("Source code", "muted")}
+
+
+def link_pill(c, label, color):
+    w, h = round(28 + len(label) * 7.6 + 34), 32
+    body = (f'<rect x="0.5" y="0.5" width="{w - 1}" height="{h - 1}" rx="16" fill="{c["raised"]}" stroke="{c["border"]}"/>'
+            f'<circle cx="16" cy="16" r="4" fill="{c[color]}"/>'
+            + text(28, 20.5, label, 13, c["ink"], weight=600)
+            + arrow(w - 23, 11.5, c["muted"]))
+    return w, h, label, body
 
 
 if __name__ == "__main__":
-    hero(); terminal(); metrics(); footer()
-    card("card-eduexamine.svg", "01", "PROJECT_01 // LIVE", "EduExamine", "Online examination platform",
-         "Role-based dashboards, multi-language coding tests and AI study assistants.",
-         ["React", "TypeScript", "Node.js", "Express", "MongoDB", "JWT"], "5", "CODE LANGUAGES", "OPEN LIVE ↗", CYAN)
-    card("card-smartfinancecalc.svg", "02", "PROJECT_02 // ANDROID · iOS", "SmartFinanceCalc", "Offline-first finance calculator app",
-         "India Old vs New tax engine, 8-country support, zero network calls.",
-         ["React Native", "Expo", "TypeScript", "AsyncStorage"], "56", "CALCULATORS", "VIEW CODE ↗", GREEN)
-    card("card-devanta.svg", "03", "PROJECT_03 // LIVE", "Devanta", "GitHub → portfolio generator",
-         "Paste a GitHub username, get a live portfolio in 3 switchable themes.",
-         ["Next.js 14", "Express", "Tailwind", "Framer Motion", "Vitest"], "3", "LIVE THEMES", "OPEN LIVE ↗", MAGENTA)
-    for f, n, l, h in [("sec-boot.svg", "01", "BOOT_SEQUENCE", "whoami --verbose"),
-                       ("sec-metrics.svg", "02", "CORE_METRICS", "production numbers"),
-                       ("sec-projects.svg", "03", "ACTIVE_MODULES", "click a card to open"),
-                       ("sec-log.svg", "04", "MISSION_LOG", "experience + education"),
-                       ("sec-arch.svg", "05", "SYSTEM_BLUEPRINT", "zoom / pan enabled"),
-                       ("sec-stack.svg", "06", "TECH_ARSENAL", "tools I ship with"),
-                       ("sec-telemetry.svg", "07", "LIVE_TELEMETRY", "auto-updating")]:
-        section(f, n, l, h)
-    print("assets:", sorted(os.listdir(OUT)))
+    os.makedirs(OUT, exist_ok=True)
+    for mode, c in THEMES.items():
+        for name, build in (("header", header), ("metrics", metrics), ("about", about_me), ("services", services),
+                            ("hardening", hardening), ("experience", experience), ("platform", platform),
+                            ("timeline", timeline), ("stack", stack), ("footer", footer)):
+            save(f"{name}-{mode}.svg", *build(c))
+        for slug, spec in SECTIONS.items():
+            save(f"section-{slug}-{mode}.svg", *section(c, *spec))
+        for slug, spec in PROJECTS.items():
+            save(f"card-{slug}-{mode}.svg", *card(c, *spec))
+        for slug, (label, color) in LINKS.items():
+            save(f"link-{slug}-{mode}.svg", *link_pill(c, label, color))
+    print("assets written to", OUT)
