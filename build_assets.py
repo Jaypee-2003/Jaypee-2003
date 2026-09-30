@@ -37,6 +37,20 @@ def text(x, y, s, size, fill, font=SANS, weight=400, anchor="start", ls=0):
             f'{escape(s)}</text>')
 
 
+def rich(x, y, parts, size, font=SANS):
+    """One line of text made of differently styled runs: parts are (text, fill, weight)."""
+    spans = "".join(f'<tspan fill="{fill}" font-weight="{weight}">{escape(s)}</tspan>' for s, fill, weight in parts)
+    return f'<text x="{x}" y="{y}" font-family="{font}" font-size="{size}">{spans}</text>'
+
+
+def palette_strip(h, c):
+    """Left edge split into the four accent colours, clipped to the card's rounded corners."""
+    seg = h / 4
+    return (f'<defs><clipPath id="card"><rect x="0.5" y="0.5" width="{W - 1}" height="{h - 1}" rx="14"/></clipPath></defs>'
+            + "".join(f'<rect x="0" y="{i * seg:.1f}" width="5" height="{seg + 0.5:.1f}" fill="{c[k]}" clip-path="url(#card)"/>'
+                      for i, k in enumerate(("blue", "teal", "amber", "rose"))))
+
+
 def panel(w, h, c, strip=None):
     """Card background; `strip` paints a colored left edge clipped to the rounded corners."""
     s = (f'<rect x="0.5" y="0.5" width="{w - 1}" height="{h - 1}" rx="14" '
@@ -170,6 +184,70 @@ def header(c):
                   "from architecture to production. Open to full-time roles, freelance and contract work."), body
 
 
+def intro(c):
+    H = 262
+    ink = c["ink"]
+    body = (panel(W, H, c) + palette_strip(H, c)
+            + text(36, 46, "HELLO, I'M JAYPRAKASH", 11.5, c["teal"], MONO, 600, ls=1.5)
+            + rich(36, 90, [("I build ", ink, 400), ("AI-powered applications", c["rose"], 700), (", ", ink, 400),
+                            ("secure multi-role backends", c["amber"], 700), (" and", ink, 400)], 22)
+            + rich(36, 122, [("SaaS platforms", c["teal"], 700), (", and I own them from ", ink, 400),
+                             ("architecture to delivery", ink, 700), (".", ink, 400)], 22)
+            + text(36, 160, "Most recently I spent ten months at Dukaan Dost on a SaaS platform that serves 1K+ users.",
+                   15.5, c["text"])
+            + f'<circle cx="41" cy="182" r="4" fill="{c["live"]}"/>'
+            + text(54, 187, "Looking for a full-time role, and open to freelance and contract projects too.",
+                   15.5, c["text"])
+            + chips(c, 36, 208, ["React", "Node.js", "Python", "Docker", "AWS"])[0])
+    return W, H, ("I build AI-powered applications, secure multi-role backends and SaaS platforms, and I own them from "
+                  "architecture to delivery. Most recently I spent ten months at Dukaan Dost on a SaaS platform that "
+                  "serves 1K+ users. Looking for a full-time role, and open to freelance and contract projects too. "
+                  "React, Node.js, Python, Docker, AWS."), body
+
+
+def container(c, x, y, color, code):
+    w, h = 118, 42
+    ribs = "".join(f'<line x1="{x + i}" y1="{y + 6}" x2="{x + i}" y2="{y + h - 6}" stroke="{c[color]}" stroke-opacity="0.4"/>'
+                   for i in range(62, w - 4, 7))
+    return (f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="3" fill="{c[color]}" fill-opacity="{c["tint"] * 2:.2f}" '
+            f'stroke="{c[color]}" stroke-width="1.5"/>{ribs}'
+            f'<rect x="{x + 7}" y="{y + 7}" width="48" height="16" rx="2" fill="{c["raised"]}" stroke="{c[color]}" stroke-opacity="0.4"/>'
+            + text(x + 31, y + 19, code, 10, c[color], MONO, 700, anchor="middle", ls=0.6))
+
+
+def portfolio(c):
+    H, mid = 212, 519
+    steel = f'fill="{c["muted"]}" fill-opacity="0.55"'
+    body = f"""
+<defs><pattern id="dots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="{c["dots"]}"/></pattern></defs>
+{panel(W, H, c, strip="blue")}
+<rect x="{mid}" y="1" width="{W - mid - 1}" height="{H - 2}" rx="13" fill="url(#dots)"/>
+{text(36, 46, "MY PORTFOLIO", 11.5, c["blue"], MONO, 600, ls=1.5)}
+{text(36, 84, "Walk through my 3D container yard", 24, c["ink"], weight=700, ls=-0.3)}
+{text(36, 112, "Every project is a stack of shipping", 15.5, c["text"])}
+{text(36, 134, "containers, each with its own manifest.", 15.5, c["text"])}
+<rect x="36" y="152" width="172" height="40" rx="20" fill="{c["button"]}"/>
+{text(62, 177, "Visit portfolio", 14, c["button_text"], weight=600)}
+{arrow(176, 167.5, c["button_text"])}
+{text(224, 177, "jaypee-2003.github.io/jaypee", 13, c["muted"], MONO)}
+<line x1="530" y1="181" x2="852" y2="181" stroke="{c["border"]}" stroke-width="2"/>
+<rect x="818" y="30" width="6" height="151" {steel}/>
+<rect x="600" y="26" width="232" height="6" {steel}/>
+<path d="M818 60L790 32" stroke="{c["muted"]}" stroke-opacity="0.55" stroke-width="3"/>
+{container(c, 548, 138, "rose", "EDX-01")}
+{container(c, 672, 138, "blue", "DVN-02")}
+{container(c, 548, 95, "amber", "SFC-03")}
+<g>
+  <animateTransform attributeName="transform" type="translate" values="0 0;0 5;0 0" dur="4s" repeatCount="indefinite"/>
+  <path d="M731 36L684 64M731 36L778 64" stroke="{c["muted"]}" stroke-width="1.3" fill="none"/>
+  {container(c, 672, 64, "teal", "KHP-04")}
+</g>
+<rect x="719" y="32" width="24" height="9" rx="2" fill="{c["ink"]}" fill-opacity="0.8"/>
+"""
+    return W, H, ("My portfolio: walk through my 3D container yard. Every project is a stack of shipping containers, "
+                  "each with its own manifest. Visit jaypee-2003.github.io/jaypee"), body
+
+
 def metrics(c):
     H = 112
     items = [("1K+", "users on the SaaS I built", "blue"),
@@ -200,7 +278,7 @@ def section(c, color, title, hint):
 def services(c):
     items = [("teal", "api", "APIs and back ends", ["Node.js, Express and FastAPI services with", "Redis caching and tuned MongoDB queries"]),
              ("blue", "web", "Web and mobile apps", ["Dashboards in React and Next.js; mobile", "apps in React Native and Expo"]),
-             ("rose", "chat", "AI in production", ["LLM features through OpenRouter, so models", "can be swapped without a rewrite"]),
+             ("rose", "chat", "AI in production", ["LLM features and RAG pipelines through", "OpenRouter, grounded in product data"]),
              ("amber", "shield", "Security by design", ["JWT on every request, RBAC by role, and", "activity logging with integrity checks"])]
     tw, th, gap = (W - 56 - 14) // 2, 92, 14
     H = 28 * 2 + th * 2 + gap
@@ -246,13 +324,14 @@ def card(c, color, tag, name, tagline, stack, points, stats=()):
 
 
 def about_me(c):
-    H = 262
+    H = 284
     note = [["I own features end to end: the schema, the",
              "API, the screen and the deploy. I start every",
              "system from who can do what, so security is",
              "designed in, not bolted on."],
-            ["My portfolio is a 3D container yard where",
-             "every project is a stack of shipping containers."]]
+            ["Outside client work I build my own products:",
+             "an exam platform, an offline finance app and",
+             "a GitHub portfolio generator."]]
     facts = [("BASED IN", "Cuttack, Odisha · IST"), ("STUDIED", "MCA and B.Sc CS at Ravenshaw"),
              ("WORKED AT", "Dukaan Dost, remote contract"), ("BUILDS WITH", "React, Node.js, Python, AWS"),
              ("RIGHT NOW", "Available immediately")]
@@ -272,9 +351,9 @@ def about_me(c):
         y += 12
     body += f'<line x1="490" y1="80" x2="490" y2="{H - 30}" stroke="{c["border"]}"/>'
     for i, (label, value) in enumerate(facts):
-        fy = 96 + i * 34
+        fy = 106 + i * 36
         if i:
-            body += f'<line x1="514" y1="{fy - 21}" x2="{W - 36}" y2="{fy - 21}" stroke="{c["border"]}" stroke-dasharray="2 4"/>'
+            body += f'<line x1="514" y1="{fy - 22}" x2="{W - 36}" y2="{fy - 22}" stroke="{c["border"]}" stroke-dasharray="2 4"/>'
         body += text(514, fy, label, 10.5, c["muted"], MONO, 600, ls=1.2)
         if label == "RIGHT NOW":
             body += f'<circle cx="630" cy="{fy - 4.5}" r="4" fill="{c["live"]}"/>' + text(642, fy, value, 14, c["ink"], weight=600)
@@ -350,27 +429,31 @@ def platform(c):
                   "(30–40% faster responses) and an indexed MongoDB, all running on Docker Compose."), body
 
 
-def timeline(c):
-    H = 180
-    steps = [("blue", "2021", "Started B.Sc (Hons)", "CS at Ravenshaw"),
-             ("teal", "2024", "B.Sc done · CGPA 7.12", "Started my MCA"),
-             ("amber", "SEP 2025", "Joined Dukaan Dost", "Remote contract"),
-             ("rose", "2026", "MCA done · CGPA 7.77", "Contract wrapped, June"),
-             ("live", "NOW", "Open to work", "Full-time or freelance")]
-    xs = [104 + i * (W - 208) / 4 for i in range(5)]
-    body = panel(W, H, c) + f'<line x1="{xs[0]}" y1="88" x2="{xs[-1]}" y2="88" stroke="{c["border"]}" stroke-width="2"/>'
-    for x, (color, when, title, sub) in zip(xs, steps):
-        x = round(x, 1)
-        body += (text(x, 64, when, 12, c[color], MONO, 700, anchor="middle", ls=1.2)
-                 + f'<circle cx="{x}" cy="88" r="7" fill="{c["surface"]}" stroke="{c[color]}" stroke-width="2.5"/>'
-                 + f'<circle cx="{x}" cy="88" r="3" fill="{c[color]}"/>'
-                 + text(x, 124, title, 13.5, c["ink"], weight=700, anchor="middle")
-                 + text(x, 145, sub, 12.5, c["text"], anchor="middle"))
-        if when == "NOW":
-            body += (f'<circle cx="{x}" cy="88" r="7" fill="none" stroke="{c[color]}" stroke-width="1.5">'
-                     f'<animate attributeName="r" values="7;14" dur="2.4s" repeatCount="indefinite"/>'
-                     f'<animate attributeName="opacity" values="0.7;0" dur="2.4s" repeatCount="indefinite"/></circle>')
-    return W, H, "Timeline: " + " ".join(f"{w}: {t}, {s}." for _, w, t, s in steps), body
+def education(c):
+    H = 244
+    degrees = [("blue", "2021 – 2024", "B.Sc (Hons) Computer Science", 7.12),
+               ("teal", "2024 – 2026", "Master of Computer Applications", 7.77)]
+    tw = (W - 72 - 16) // 2
+    body = panel(W, H, c)
+    xs = (36, 36 + tw + 8, W - 36)
+    body += f'<line x1="{xs[0] + 5}" y1="44" x2="{xs[2] - 5}" y2="44" stroke="{c["border"]}" stroke-width="2"/>'
+    for x, year, anchor in zip(xs, ("2021", "2024", "2026"), ("start", "middle", "end")):
+        dot_x = {"start": x + 5, "middle": x, "end": x - 5}[anchor]
+        body += (f'<circle cx="{dot_x}" cy="44" r="5" fill="{c["surface"]}" stroke="{c["muted"]}" stroke-width="2"/>'
+                 + text(x, 30, year, 11.5, c["muted"], MONO, 700, anchor=anchor, ls=1))
+    for i, (color, years, degree, cgpa) in enumerate(degrees):
+        x, y = 36 + i * (tw + 16), 66
+        body += (f'<rect x="{x}" y="{y}" width="{tw}" height="150" rx="10" fill="{c["raised"]}" stroke="{c["border"]}"/>'
+                 f'<rect x="{x}" y="{y}" width="{tw}" height="4" rx="2" fill="{c[color]}"/>'
+                 + text(x + 24, y + 34, years, 11.5, c[color], MONO, 600, ls=1.5)
+                 + text(x + 24, y + 64, degree, 19, c["ink"], weight=700)
+                 + text(x + 24, y + 88, "Ravenshaw University, Cuttack", 14, c["text"])
+                 + text(x + 24, y + 128, f"{cgpa:.2f}", 26, c[color], weight=700, ls=-0.3)
+                 + text(x + 84, y + 128, "CGPA / 10", 12, c["muted"], MONO)
+                 + f'<rect x="{x + 176}" y="{y + 118}" width="{tw - 200}" height="8" rx="4" fill="{c[color]}" fill-opacity="{c["tint"] * 1.5:.2f}"/>'
+                 + f'<rect x="{x + 176}" y="{y + 118}" width="{(tw - 200) * cgpa / 10:.1f}" height="8" rx="4" fill="{c[color]}"/>')
+    return W, H, ("Education at Ravenshaw University, Cuttack: B.Sc (Hons) Computer Science, 2021–2024, CGPA 7.12 out of 10. "
+                  "Master of Computer Applications, 2024–2026, CGPA 7.77 out of 10."), body
 
 
 def hardening(c):
@@ -388,25 +471,32 @@ def hardening(c):
 
 
 def stack(c):
-    rows = [("LANGUAGES", None, ["JavaScript", "TypeScript", "Python", "SQL"], "familiar: Java, Go, PHP"),
-            ("FRONTEND", "blue", ["React", "Next.js", "React Native", "Expo", "Tailwind CSS"], ""),
-            ("BACKEND", "teal", ["Node.js", "Express", "FastAPI", "Django", "REST", "WebSockets", "JWT", "RBAC"], ""),
-            ("DATA", "rose", ["MongoDB", "MySQL", "Redis"], ""),
-            ("DEVOPS & CLOUD", "amber", ["Docker Compose", "AWS EC2/S3/Lambda", "CI/CD", "Git", "Linux", "Vercel", "Render"], ""),
-            ("AI", "blue", ["LLM integration", "OpenRouter", "Prompt engineering"], "")]
-    H = 34 + len(rows) * 42 + 22
-    body = panel(W, H, c)
-    for i, (label, color, items, note) in enumerate(rows):
-        y = 34 + i * 42
+    rows = [("LANGUAGES", None, ["JavaScript", "TypeScript", "Python", "SQL", "Java", "Go", "PHP"]),
+            ("FRONTEND", "blue", ["React", "Next.js", "Tailwind CSS", "Bootstrap", "jQuery", "AJAX", "Framer Motion", "Vite"]),
+            ("MOBILE", "blue", ["React Native", "Expo", "Expo Router", "AsyncStorage"]),
+            ("BACKEND", "teal", ["Node.js", "Express", "FastAPI", "Django", "Laravel", "REST", "WebSockets", "JWT", "RBAC"]),
+            ("DATA", "teal", ["MongoDB", "MySQL", "Redis"]),
+            ("AI", "rose", ["LLM integration", "RAG pipelines", "OpenRouter", "Prompt engineering", "Chat history",
+                            "AI services in FastAPI"]),
+            ("DEVOPS & CLOUD", "amber", ["Docker", "Docker Compose", "AWS EC2", "S3", "Lambda", "CI/CD", "Git", "Linux",
+                                        "Vercel", "Render"]),
+            ("QUALITY", None, ["Vitest", "ESLint", "Postman"])]
+    body, y, x0, right = "", 34, 180, W - 36
+    for i, (label, color, items) in enumerate(rows):
         if i:
-            body += f'<line x1="36" y1="{y - 8}" x2="{W - 36}" y2="{y - 8}" stroke="{c["border"]}" stroke-dasharray="2 4"/>'
+            body += f'<line x1="36" y1="{y - 8}" x2="{right}" y2="{y - 8}" stroke="{c["border"]}" stroke-dasharray="2 4"/>'
         body += text(36, y + 17, label, 11.5, c[color] if color else c["muted"], MONO, 600, ls=1.2)
-        row, end = chips(c, 180, y, items, color)
-        body += row
-        if note:
-            body += text(f"{end + 6:.1f}", y + 17, note, 13, c["muted"], MONO)
-    alt = " · ".join(f"{l.title()}: {', '.join(it)}" + (f" ({n})" if n else "") for l, _, it, n in rows)
-    return W, H, alt, body
+        x = x0
+        for item in items:
+            w = len(item) * 12 * 0.62 + 20
+            if x + w > right:
+                x, y = x0, y + 34
+            body += chips(c, x, y, [item], color)[0]
+            x += w + 8
+        y += 42
+    H = y + 14
+    alt = " · ".join(f"{l.title()}: {', '.join(it)}" for l, _, it in rows)
+    return W, H, alt, panel(W, H, c) + body
 
 
 def footer(c):
@@ -450,12 +540,12 @@ PROJECTS = {
 }
 
 SECTIONS = {
+    "experience": ("blue", "Experience", "10 months · remote"),
+    "work": ("rose", "Selected work", "click a card to open it"),
+    "stack": ("teal", "Stack", "what I ship with"),
+    "education": ("amber", "Education", "Ravenshaw University, Cuttack"),
     "me": ("rose", "About me", "the person behind the commits"),
     "services": ("teal", "What I do", "for teams and clients"),
-    "work": ("blue", "Selected work", "click a card to open it"),
-    "experience": ("amber", "Experience", "10 months · remote"),
-    "timeline": ("rose", "Timeline", "2021 → now"),
-    "stack": ("teal", "Stack", "what I ship with"),
     "activity": ("blue", "GitHub activity", "redrawn daily"),
 }
 
@@ -475,9 +565,9 @@ def link_pill(c, label, color):
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     for mode, c in THEMES.items():
-        for name, build in (("header", header), ("metrics", metrics), ("about", about_me), ("services", services),
+        for name, build in (("header", header), ("intro", intro), ("portfolio", portfolio), ("metrics", metrics), ("about", about_me), ("services", services),
                             ("hardening", hardening), ("experience", experience), ("platform", platform),
-                            ("timeline", timeline), ("stack", stack), ("footer", footer)):
+                            ("education", education), ("stack", stack), ("footer", footer)):
             save(f"{name}-{mode}.svg", *build(c))
         for slug, spec in SECTIONS.items():
             save(f"section-{slug}-{mode}.svg", *section(c, *spec))
